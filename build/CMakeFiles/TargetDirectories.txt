@@ -1,0 +1,6 @@
+/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles/rebuild_cache.dir
+/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles/edit_cache.dir
+/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles/ChinaMaster.dir
+/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base/CMakeFiles/rebuild_cache.dir
+/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base/CMakeFiles/edit_cache.dir
+/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base/CMakeFiles/base.dir

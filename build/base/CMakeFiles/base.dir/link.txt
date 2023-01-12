@@ -1,0 +1,2 @@
+/usr/bin/ar qc libbase.a  CMakeFiles/base.dir/application.cpp.o CMakeFiles/base.dir/camera.cpp.o CMakeFiles/base.dir/glad.c.o CMakeFiles/base.dir/glsl_program.cpp.o CMakeFiles/base.dir/model.cpp.o CMakeFiles/base.dir/object3d.cpp.o CMakeFiles/base.dir/skybox.cpp.o CMakeFiles/base.dir/stb_image.cpp.o CMakeFiles/base.dir/stb_vorbis.c.o CMakeFiles/base.dir/texture.cpp.o
+/usr/bin/ranlib libbase.a
