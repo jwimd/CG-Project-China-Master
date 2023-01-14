@@ -179,6 +179,33 @@ camera.cpp.s:
 	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build && $(MAKE) -f base/CMakeFiles/base.dir/build.make base/CMakeFiles/base.dir/camera.cpp.s
 .PHONY : camera.cpp.s
 
+fullscreen_quad.o: fullscreen_quad.cpp.o
+
+.PHONY : fullscreen_quad.o
+
+# target to build an object file
+fullscreen_quad.cpp.o:
+	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build && $(MAKE) -f base/CMakeFiles/base.dir/build.make base/CMakeFiles/base.dir/fullscreen_quad.cpp.o
+.PHONY : fullscreen_quad.cpp.o
+
+fullscreen_quad.i: fullscreen_quad.cpp.i
+
+.PHONY : fullscreen_quad.i
+
+# target to preprocess a source file
+fullscreen_quad.cpp.i:
+	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build && $(MAKE) -f base/CMakeFiles/base.dir/build.make base/CMakeFiles/base.dir/fullscreen_quad.cpp.i
+.PHONY : fullscreen_quad.cpp.i
+
+fullscreen_quad.s: fullscreen_quad.cpp.s
+
+.PHONY : fullscreen_quad.s
+
+# target to generate assembly for a file
+fullscreen_quad.cpp.s:
+	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build && $(MAKE) -f base/CMakeFiles/base.dir/build.make base/CMakeFiles/base.dir/fullscreen_quad.cpp.s
+.PHONY : fullscreen_quad.cpp.s
+
 glad.o: glad.c.o
 
 .PHONY : glad.o
@@ -410,6 +437,9 @@ help:
 	@echo "... camera.o"
 	@echo "... camera.i"
 	@echo "... camera.s"
+	@echo "... fullscreen_quad.o"
+	@echo "... fullscreen_quad.i"
+	@echo "... fullscreen_quad.s"
 	@echo "... glad.o"
 	@echo "... glad.i"
 	@echo "... glad.s"

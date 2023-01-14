@@ -83,9 +83,22 @@ base/CMakeFiles/base.dir/camera.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/base.dir/camera.cpp.s"
 	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/camera.cpp -o CMakeFiles/base.dir/camera.cpp.s
 
+base/CMakeFiles/base.dir/fullscreen_quad.cpp.o: base/CMakeFiles/base.dir/flags.make
+base/CMakeFiles/base.dir/fullscreen_quad.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/fullscreen_quad.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object base/CMakeFiles/base.dir/fullscreen_quad.cpp.o"
+	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && /usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/base.dir/fullscreen_quad.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/fullscreen_quad.cpp
+
+base/CMakeFiles/base.dir/fullscreen_quad.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/base.dir/fullscreen_quad.cpp.i"
+	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/fullscreen_quad.cpp > CMakeFiles/base.dir/fullscreen_quad.cpp.i
+
+base/CMakeFiles/base.dir/fullscreen_quad.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/base.dir/fullscreen_quad.cpp.s"
+	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/fullscreen_quad.cpp -o CMakeFiles/base.dir/fullscreen_quad.cpp.s
+
 base/CMakeFiles/base.dir/glad.c.o: base/CMakeFiles/base.dir/flags.make
 base/CMakeFiles/base.dir/glad.c.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/glad.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object base/CMakeFiles/base.dir/glad.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object base/CMakeFiles/base.dir/glad.c.o"
 	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && /usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/base.dir/glad.c.o   -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/glad.c
 
 base/CMakeFiles/base.dir/glad.c.i: cmake_force
@@ -98,7 +111,7 @@ base/CMakeFiles/base.dir/glad.c.s: cmake_force
 
 base/CMakeFiles/base.dir/glsl_program.cpp.o: base/CMakeFiles/base.dir/flags.make
 base/CMakeFiles/base.dir/glsl_program.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/glsl_program.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object base/CMakeFiles/base.dir/glsl_program.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object base/CMakeFiles/base.dir/glsl_program.cpp.o"
 	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && /usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/base.dir/glsl_program.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/glsl_program.cpp
 
 base/CMakeFiles/base.dir/glsl_program.cpp.i: cmake_force
@@ -111,7 +124,7 @@ base/CMakeFiles/base.dir/glsl_program.cpp.s: cmake_force
 
 base/CMakeFiles/base.dir/model.cpp.o: base/CMakeFiles/base.dir/flags.make
 base/CMakeFiles/base.dir/model.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/model.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object base/CMakeFiles/base.dir/model.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object base/CMakeFiles/base.dir/model.cpp.o"
 	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && /usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/base.dir/model.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/model.cpp
 
 base/CMakeFiles/base.dir/model.cpp.i: cmake_force
@@ -124,7 +137,7 @@ base/CMakeFiles/base.dir/model.cpp.s: cmake_force
 
 base/CMakeFiles/base.dir/object3d.cpp.o: base/CMakeFiles/base.dir/flags.make
 base/CMakeFiles/base.dir/object3d.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/object3d.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object base/CMakeFiles/base.dir/object3d.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object base/CMakeFiles/base.dir/object3d.cpp.o"
 	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && /usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/base.dir/object3d.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/object3d.cpp
 
 base/CMakeFiles/base.dir/object3d.cpp.i: cmake_force
@@ -137,7 +150,7 @@ base/CMakeFiles/base.dir/object3d.cpp.s: cmake_force
 
 base/CMakeFiles/base.dir/skybox.cpp.o: base/CMakeFiles/base.dir/flags.make
 base/CMakeFiles/base.dir/skybox.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/skybox.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object base/CMakeFiles/base.dir/skybox.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object base/CMakeFiles/base.dir/skybox.cpp.o"
 	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && /usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/base.dir/skybox.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/skybox.cpp
 
 base/CMakeFiles/base.dir/skybox.cpp.i: cmake_force
@@ -150,7 +163,7 @@ base/CMakeFiles/base.dir/skybox.cpp.s: cmake_force
 
 base/CMakeFiles/base.dir/stb_image.cpp.o: base/CMakeFiles/base.dir/flags.make
 base/CMakeFiles/base.dir/stb_image.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/stb_image.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object base/CMakeFiles/base.dir/stb_image.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object base/CMakeFiles/base.dir/stb_image.cpp.o"
 	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && /usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/base.dir/stb_image.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/stb_image.cpp
 
 base/CMakeFiles/base.dir/stb_image.cpp.i: cmake_force
@@ -163,7 +176,7 @@ base/CMakeFiles/base.dir/stb_image.cpp.s: cmake_force
 
 base/CMakeFiles/base.dir/stb_vorbis.c.o: base/CMakeFiles/base.dir/flags.make
 base/CMakeFiles/base.dir/stb_vorbis.c.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/stb_vorbis.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object base/CMakeFiles/base.dir/stb_vorbis.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object base/CMakeFiles/base.dir/stb_vorbis.c.o"
 	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && /usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/base.dir/stb_vorbis.c.o   -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/stb_vorbis.c
 
 base/CMakeFiles/base.dir/stb_vorbis.c.i: cmake_force
@@ -176,7 +189,7 @@ base/CMakeFiles/base.dir/stb_vorbis.c.s: cmake_force
 
 base/CMakeFiles/base.dir/texture.cpp.o: base/CMakeFiles/base.dir/flags.make
 base/CMakeFiles/base.dir/texture.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/texture.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object base/CMakeFiles/base.dir/texture.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object base/CMakeFiles/base.dir/texture.cpp.o"
 	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && /usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/base.dir/texture.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/texture.cpp
 
 base/CMakeFiles/base.dir/texture.cpp.i: cmake_force
@@ -191,6 +204,7 @@ base/CMakeFiles/base.dir/texture.cpp.s: cmake_force
 base_OBJECTS = \
 "CMakeFiles/base.dir/application.cpp.o" \
 "CMakeFiles/base.dir/camera.cpp.o" \
+"CMakeFiles/base.dir/fullscreen_quad.cpp.o" \
 "CMakeFiles/base.dir/glad.c.o" \
 "CMakeFiles/base.dir/glsl_program.cpp.o" \
 "CMakeFiles/base.dir/model.cpp.o" \
@@ -205,6 +219,7 @@ base_EXTERNAL_OBJECTS =
 
 base/libbase.a: base/CMakeFiles/base.dir/application.cpp.o
 base/libbase.a: base/CMakeFiles/base.dir/camera.cpp.o
+base/libbase.a: base/CMakeFiles/base.dir/fullscreen_quad.cpp.o
 base/libbase.a: base/CMakeFiles/base.dir/glad.c.o
 base/libbase.a: base/CMakeFiles/base.dir/glsl_program.cpp.o
 base/libbase.a: base/CMakeFiles/base.dir/model.cpp.o
@@ -215,7 +230,7 @@ base/libbase.a: base/CMakeFiles/base.dir/stb_vorbis.c.o
 base/libbase.a: base/CMakeFiles/base.dir/texture.cpp.o
 base/libbase.a: base/CMakeFiles/base.dir/build.make
 base/libbase.a: base/CMakeFiles/base.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX static library libbase.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Linking CXX static library libbase.a"
 	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && $(CMAKE_COMMAND) -P CMakeFiles/base.dir/cmake_clean_target.cmake
 	cd /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/base.dir/link.txt --verbose=$(VERBOSE)
 

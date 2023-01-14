@@ -16,6 +16,7 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/application.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base/CMakeFiles/base.dir/application.cpp.o"
   "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/camera.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base/CMakeFiles/base.dir/camera.cpp.o"
+  "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/fullscreen_quad.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base/CMakeFiles/base.dir/fullscreen_quad.cpp.o"
   "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/glsl_program.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base/CMakeFiles/base.dir/glsl_program.cpp.o"
   "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/model.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base/CMakeFiles/base.dir/model.cpp.o"
   "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/object3d.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base/CMakeFiles/base.dir/object3d.cpp.o"

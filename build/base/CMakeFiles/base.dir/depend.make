@@ -14,6 +14,11 @@ base/CMakeFiles/base.dir/camera.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Pro
 base/CMakeFiles/base.dir/camera.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/camera.h
 base/CMakeFiles/base.dir/camera.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/object3d.h
 
+base/CMakeFiles/base.dir/fullscreen_quad.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/fullscreen_quad.cpp
+base/CMakeFiles/base.dir/fullscreen_quad.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/fullscreen_quad.h
+base/CMakeFiles/base.dir/fullscreen_quad.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/stb_image.h
+base/CMakeFiles/base.dir/fullscreen_quad.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/texture.h
+
 base/CMakeFiles/base.dir/glsl_program.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/glsl_program.cpp
 base/CMakeFiles/base.dir/glsl_program.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/glsl_program.h
 

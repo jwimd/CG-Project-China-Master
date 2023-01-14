@@ -5,8 +5,10 @@
 using namespace std;
 
 #include "base/vertex.h"
+#include "base/bounding_box.h"
+#include "base/camera.h"
 // 贝塞尔旋转曲面类
-class BezierFace
+class BezierFace : public Object3D
 {
 	// 顶点数
 	int numVertices;

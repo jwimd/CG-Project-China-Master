@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/base.dir/application.cpp.o"
   "CMakeFiles/base.dir/camera.cpp.o"
+  "CMakeFiles/base.dir/fullscreen_quad.cpp.o"
   "CMakeFiles/base.dir/glad.c.o"
   "CMakeFiles/base.dir/glsl_program.cpp.o"
   "CMakeFiles/base.dir/model.cpp.o"

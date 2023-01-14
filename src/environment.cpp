@@ -11,6 +11,7 @@ const std::string conePath = "../media/shape/cone.obj";
 const std::string prismPath = "../media/shape/prism_6.obj";
 const std::string prismaticTable6Path = "../media/shape/prismatic_table_6_0.5.obj";
 const std::string prismaticTable4Path = "../media/shape/prismatic_table_4_0.3.obj";
+const std::string knotPath = "../media/shape/knot.obj";
 
 const std::string woodTexturePath = "../media/texture/wood.jpg";
 const std::string brickTexturePath = "../media/texture/brick.jpg";
@@ -24,27 +25,27 @@ const std::string tableTexturePath = "../media/resources/wood2.jpg";
 const string objTexturePaths[] = {
 	"../media/resources/stone.jpg",
 	"../media/resources/stone2.jpg",
-	"../media/resources/purple_normal.png",
+	"../media/resources/purple.png",
+	"../media/resources/purple_normal.png"};
+
+const string objSideTexturePaths[] = {
 	"../media/resources/texture/side1.jpg",
-	"../media/resources/texture/side2.jpg",
+	"../media/resources/texture/side2.jpg"};
+
+const string objTopTexturePaths[] = {
 	"../media/resources/texture/top1.jpg",
 	"../media/resources/texture/top2.jpg"};
 
-const std::vector<std::string> skyboxTexturePaths = {
-	"../media/starfield/Right_Tex.jpg",
-	"../media/starfield/Left_Tex.jpg",
-	"../media/starfield/Up_Tex.jpg",
-	"../media/starfield/Down_Tex.jpg",
-	"../media/starfield/Front_Tex.jpg",
-	"../media/starfield/Back_Tex.jpg"};
+const std::vector<std::string>
+	skyboxTexturePaths = {"../media/starfield/Right_Tex.jpg", "../media/starfield/Left_Tex.jpg", "../media/starfield/Up_Tex.jpg", "../media/starfield/Down_Tex.jpg", "../media/starfield/Front_Tex.jpg", "../media/starfield/Back_Tex.jpg"};
 
 const std::vector<std::string> gameSkyboxTexturePaths = {
 	"../media/resources/skybox/right.jpg",
-	"../media/starfield/left.jpg",
-	"../media/starfield/up.jpg",
-	"../media/starfield/down.jpg",
-	"../media/starfield/front.jpg",
-	"../media/starfield/back.jpg"};
+	"../media/resources/skybox/left.jpg",
+	"../media/resources/skybox/top.jpg",
+	"../media/resources/skybox/bottom.jpg",
+	"../media/resources/skybox/front.jpg",
+	"../media/resources/skybox/back.jpg"};
 
 FinalProject::FinalProject(const Options &options) : Application(options)
 {
@@ -120,6 +121,10 @@ FinalProject::FinalProject(const Options &options) : Application(options)
 	_geometry.gameObject->position = glm::vec3{0.0f, 0.0f, 0.0f};
 	_geometry.gameObject->scale = glm::vec3{0.2f, 0.2f, 0.2f};
 
+	_geometry.knot = new Model(knotPath);
+	_geometry.knot->position = glm::vec3{0.0f, 0.7f, 3.0f};
+	_geometry.knot->scale = glm::vec3{0.2f, 0.2f, 0.2f};
+
 	_spotLightSphere.reset(new Model(spherePath));
 	_spotLightSphere->position = glm::vec3{0.0f, 10.0f, 10.0f};
 	_spotLightSphere->scale = glm::vec3{0.5f, 0.5f, 0.5f};
@@ -133,13 +138,24 @@ FinalProject::FinalProject(const Options &options) : Application(options)
 	_texture.plastic.reset(new Texture2D(plasticTexturePath));
 	_texture.table.reset(new Texture2D(tableTexturePath));
 
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 4; i++)
 		_texture.objTex[i].reset(new Texture2D(objTexturePaths[i]));
+	for (int i = 0; i < 2; i++)
+		_texture.objSideTex[i].reset(new Texture2D(objSideTexturePaths[i]));
+	for (int i = 0; i < 2; i++)
+		_texture.objTopTex[i].reset(new Texture2D(objTopTexturePaths[i]));
 
 	// init shader
 	initPhongShader();
 	initSphereShader();
 	initDancerShader();
+	initFrameShader();
+	initDepthShader();
+
+	initDepthPeelingShaders();
+	initDepthPeelingResources();
+
+	initAlphaBlendingShader();
 
 	// init lights
 	_directionalLight.reset(new DirectionalLight);
@@ -168,20 +184,179 @@ void FinalProject::handleInput()
 		return;
 	}
 
-	if (_keyboardInput.keyStates[GLFW_KEY_LEFT_CONTROL] == GLFW_PRESS && panIndex == 0)
+	if (!gameMode)
 	{
-		showCursor = false;
-		glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		if (firstPressControl == true)
+		if (_keyboardInput.keyStates[GLFW_KEY_LEFT_CONTROL] == GLFW_PRESS && panIndex == 0)
 		{
-			firstPressControl = false;
-			_mouseInput.move.xOld = _mouseInput.move.xCurrent = 0.5 * _windowWidth;
-			_mouseInput.move.yOld = _mouseInput.move.yCurrent = 0.5 * _windowHeight;
-			glfwSetCursorPos(_window, _mouseInput.move.xCurrent, _mouseInput.move.yCurrent);
+			showCursor = false;
+			glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			if (firstPressControl == true)
+			{
+				firstPressControl = false;
+				_mouseInput.move.xOld = _mouseInput.move.xCurrent = 0.5 * _windowWidth;
+				_mouseInput.move.yOld = _mouseInput.move.yCurrent = 0.5 * _windowHeight;
+				glfwSetCursorPos(_window, _mouseInput.move.xCurrent, _mouseInput.move.yCurrent);
+			}
+
+			constexpr float cameraMoveSpeed = 0.02f;
+			constexpr float cameraRotateSpeed = 0.015f;
+
+			if (_keyboardInput.keyStates[GLFW_KEY_SPACE] == GLFW_PRESS)
+			{
+				// std::cout << "switch camera" << std::endl;
+				//  switch camera
+				activeCameraIndex = (activeCameraIndex + 1) % _cameras.size();
+				_keyboardInput.keyStates[GLFW_KEY_SPACE] = GLFW_RELEASE;
+				return;
+			}
+
+			Camera *camera = _cameras[activeCameraIndex];
+
+			if (_keyboardInput.keyStates[GLFW_KEY_W] != GLFW_RELEASE)
+			{
+				// std::cout << "W" << std::endl;
+				camera->position += 0.1f * camera->getFront();
+				if (opencd == true && isInBoundingBoxGlobal(camera))
+				{
+					camera->position -= 0.1f * camera->getFront();
+				}
+			}
+
+			if (_keyboardInput.keyStates[GLFW_KEY_A] != GLFW_RELEASE)
+			{
+				// std::cout << "A" << std::endl;
+				camera->position -= 0.1f * camera->getRight();
+				if (opencd == true && isInBoundingBoxGlobal(camera))
+				{
+					camera->position += 0.1f * camera->getRight();
+				}
+			}
+
+			if (_keyboardInput.keyStates[GLFW_KEY_S] != GLFW_RELEASE)
+			{
+				// std::cout << "S" << std::endl;
+				camera->position -= 0.1f * camera->getFront();
+				if (opencd == true && isInBoundingBoxGlobal(camera))
+				{
+					camera->position += 0.1f * camera->getFront();
+				}
+			}
+
+			if (_keyboardInput.keyStates[GLFW_KEY_D] != GLFW_RELEASE)
+			{
+				// std::cout << "D" << std::endl;
+				camera->position += 0.1f * camera->getRight();
+				if (opencd == true && isInBoundingBoxGlobal(camera))
+				{
+					camera->position -= 0.1f * camera->getRight();
+				}
+			}
+
+			if (_keyboardInput.keyStates[GLFW_KEY_I] != GLFW_RELEASE)
+			{
+				// std::cout << "I" << std::endl;
+				if (camera->fovy >= glm::radians(30.0f))
+				{
+					camera->fovy -= glm::radians(0.5f);
+					camera->znear += 0.001;
+					camera->zfar += 100.0;
+				}
+			}
+
+			if (_keyboardInput.keyStates[GLFW_KEY_O] != GLFW_RELEASE)
+			{
+				// std::cout << "O" << std::endl;
+				if (camera->fovy <= glm::radians(89.5f))
+				{
+					camera->fovy += glm::radians(0.5f);
+					camera->znear -= 0.001;
+					camera->zfar -= 100.0;
+				}
+			}
+
+			if (_keyboardInput.keyStates[GLFW_KEY_F] != GLFW_RELEASE)
+			{
+				// std::cout << "F" << std::endl;
+				camera->fovy = glm::radians(60.0f);
+				camera->znear = 0.1;
+				camera->zfar = 10000.0;
+			}
+
+			if (_mouseInput.move.xCurrent != _mouseInput.move.xOld)
+			{
+				// std::cout << "mouse move in x direction" << std::endl;
+				float mouse_movement_in_x_direction = cameraRotateSpeed * (_mouseInput.move.xCurrent - _mouseInput.move.xOld);
+				glm::quat q = glm::angleAxis(glm::radians(-mouse_movement_in_x_direction), glm::vec3(0.0f, 1.0f, 0.0f));
+				camera->rotation = q * camera->rotation;
+				_mouseInput.move.xOld = _mouseInput.move.xCurrent;
+			}
+
+			if (_mouseInput.move.yCurrent != _mouseInput.move.yOld)
+			{
+				// std::cout << "mouse move in y direction" << std::endl;
+				float mouse_movement_in_y_direction = cameraRotateSpeed * (_mouseInput.move.yCurrent - _mouseInput.move.yOld);
+				glm::quat q = glm::angleAxis(glm::radians(-mouse_movement_in_y_direction), glm::vec3(camera->getRight().x, camera->getRight().y, camera->getRight().z));
+				camera->rotation = q * camera->rotation;
+				_mouseInput.move.yOld = _mouseInput.move.yCurrent;
+			}
+		}
+		else
+		{
+			if (firstPressControl == false)
+			{
+				firstPressControl = true;
+			}
+			showCursor = true;
+			glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
+	}
+	else
+	{
+		int point, circle;
+		bool lor;
+		if (_mouseInput.click.left)
+		{
+			point = _geometry.gameObject->get_point(_mouseInput.move.xOld, _mouseInput.move.yOld, _cameras[activeCameraIndex]);
+			if (point >= 0)
+				PointSelect = true;
+			else
+				PointSelect = false;
+		}
+		else if (_mouseInput.click.middle)
+		{
+			point = _geometry.gameObject->get_line_start_point(_mouseInput.move.xOld, _mouseInput.move.yOld, _cameras[activeCameraIndex]);
+			if (point >= 0)
+			{
+				_geometry.gameObject->split_point(point);
+				notChange = false;
+			}
+		}
+		else if (_mouseInput.click.right)
+		{
+			point = _geometry.gameObject->get_point(_mouseInput.move.xOld, _mouseInput.move.yOld, _cameras[activeCameraIndex]);
+			if (point >= 0)
+			{
+				_geometry.gameObject->remove_point(point);
+				notChange = false;
+			}
+		}
+		else
+			PointSelect = false;
+
+		float xoffset = _mouseInput.move.xCurrent - _mouseInput.move.xOld;
+		float yoffset = _mouseInput.move.yOld - _mouseInput.move.yCurrent;
+		// reversed since y-coordinates go from bottom to top
+
+		_mouseInput.move.xOld = _mouseInput.move.xCurrent;
+		_mouseInput.move.yOld = _mouseInput.move.yCurrent;
+
+		if (PointSelect)
+		{
+			_geometry.gameObject->modify_point(xoffset, yoffset, _cameras[activeCameraIndex]);
+			notChange = false;
 		}
 
-		constexpr float cameraMoveSpeed = 0.02f;
-		constexpr float cameraRotateSpeed = 0.005f;
+		_geometry.gameObject->remake();
 
 		if (_keyboardInput.keyStates[GLFW_KEY_SPACE] == GLFW_PRESS)
 		{
@@ -263,32 +438,14 @@ void FinalProject::handleInput()
 			camera->znear = 0.1;
 			camera->zfar = 10000.0;
 		}
-
-		if (_mouseInput.move.xCurrent != _mouseInput.move.xOld)
-		{
-			// std::cout << "mouse move in x direction" << std::endl;
-			float mouse_movement_in_x_direction = cameraRotateSpeed * (_mouseInput.move.xCurrent - _mouseInput.move.xOld);
-			glm::quat q = glm::angleAxis(glm::radians(-mouse_movement_in_x_direction), glm::vec3(0.0f, 1.0f, 0.0f));
-			camera->rotation = q * camera->rotation;
-		}
-
-		if (_mouseInput.move.yCurrent != _mouseInput.move.yOld)
-		{
-			// std::cout << "mouse move in y direction" << std::endl;
-			float mouse_movement_in_y_direction = cameraRotateSpeed * (_mouseInput.move.yCurrent - _mouseInput.move.yOld);
-			glm::quat q = glm::angleAxis(glm::radians(-mouse_movement_in_y_direction), glm::vec3(camera->getRight().x, camera->getRight().y, camera->getRight().z));
-			camera->rotation = q * camera->rotation;
-		}
 	}
-	else
-	{
-		if (firstPressControl == false)
-		{
-			firstPressControl = true;
-		}
-		showCursor = true;
-		glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	}
+
+	sunOrder += 1 * sunOrderSign;
+	_spotLightSphere->position = glm::vec3(0.005f * sunOrder, 10.0f, 10.0f);
+	if (sunOrder == 2000)
+		sunOrderSign = -1;
+	if (sunOrder == -2000)
+		sunOrderSign = 1;
 }
 
 void FinalProject::renderFrame()
@@ -299,6 +456,7 @@ void FinalProject::renderFrame()
 	_geometry.cube->computeRotationQuat();
 	_geometry.prismaticTable4->computeRotationQuat();
 	_geometry.prismaticTable6->computeRotationQuat();
+	_geometry.gameObject->computeRotationQuat();
 
 	// some options related to imGUI
 	static bool wireframe = false;
@@ -321,37 +479,91 @@ void FinalProject::renderFrame()
 	glm::mat4 projection = _cameras[activeCameraIndex]->getProjectionMatrix();
 	glm::mat4 view = _cameras[activeCameraIndex]->getViewMatrix();
 
-	switch (panIndex)
-	{
-	case 1:
-		setPanCamera(_geometry.cylinder);
-		break;
-	case 2:
-		setPanCamera(_geometry.cone);
-		break;
-	case 3:
-		setPanCamera(_geometry.prism);
-		break;
-	case 4:
-		setPanCamera(_geometry.cube);
-		break;
-	case 5:
-		setPanCamera(_geometry.prismaticTable4);
-		break;
-	case 6:
-		setPanCamera(_geometry.prismaticTable6);
-		break;
-	default:
-		break;
-	}
+	glm::mat4 lightProjection, lightView;
+	glm::mat4 lightSpaceMatrix;
+	float near_plane = 1.0f, far_plane = 20.0f;
+	lightProjection = glm::ortho(-18.0f, 18.0f, -18.0f, 18.0f, near_plane, far_plane);
+	lightView = glm::lookAt(_spotLight->position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+	lightSpaceMatrix = lightProjection * lightView;
+
+	_sphereShader->use();
+	_sphereShader->setMat4("projection", projection);
+	_sphereShader->setMat4("view", view);
+	_sphereShader->setMat4("model", _spotLightSphere->getModelMatrix());
+
+	_phongShader->use();
+	glActiveTexture(GL_TEXTURE10);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	_phongShader->setInt("shadowMap", 10);
+
+	_phongShader->setVec3("directionalLight.direction", _directionalLight->direction);
+	_phongShader->setFloat("directionalLight.intensity", _directionalLight->intensity);
+	_phongShader->setVec3("directionalLight.color", _directionalLight->color);
+	_phongShader->setMat4("projection", projection);
+	_phongShader->setMat4("view", view);
+	_phongShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+	_spotLight->position = _spotLightSphere->position;
+	_phongShader->setVec3("spotLight.position", _spotLight->position);
+	_phongShader->setVec3("spotLight.direction", _spotLight->direction);
+	_phongShader->setFloat("spotLight.intensity", _spotLight->intensity);
+	_phongShader->setVec3("spotLight.color", _spotLight->color);
+	_phongShader->setFloat("spotLight.angle", _spotLight->angle);
+	_phongShader->setFloat("spotLight.kc", _spotLight->kc);
+	_phongShader->setFloat("spotLight.kl", _spotLight->kl);
+	_phongShader->setFloat("spotLight.kq", _spotLight->kq);
+
+	_phongShader->setVec3("viewPosition", _cameras[activeCameraIndex]->position);
+
+	glActiveTexture(GL_TEXTURE1);
+	_texture.wood->bind();
+	glActiveTexture(GL_TEXTURE2);
+	_texture.brick->bind();
+	glActiveTexture(GL_TEXTURE3);
+	_texture.marbleBrown->bind();
+	glActiveTexture(GL_TEXTURE4);
+	_texture.marblePurple->bind();
+	glActiveTexture(GL_TEXTURE5);
+	_texture.metalBare->bind();
+	glActiveTexture(GL_TEXTURE6);
+	_texture.metalPainted->bind();
+	glActiveTexture(GL_TEXTURE7);
+	_texture.plastic->bind();
+	glActiveTexture(GL_TEXTURE8);
+	_texture.objTex[_geometry.gameObject->getTexIndex()]->bind();
 
 	if (!gameMode)
 	{
-		_sphereShader->use();
-		_sphereShader->setMat4("projection", projection);
-		_sphereShader->setMat4("view", view);
-		_sphereShader->setMat4("model", _spotLightSphere->getModelMatrix());
-		_spotLightSphere->draw();
+		switch (panIndex)
+		{
+		case 1:
+			setPanCamera(_geometry.cylinder);
+			break;
+		case 2:
+			setPanCamera(_geometry.cone);
+			break;
+		case 3:
+			setPanCamera(_geometry.prism);
+			break;
+		case 4:
+			setPanCamera(_geometry.cube);
+			break;
+		case 5:
+			setPanCamera(_geometry.prismaticTable4);
+			break;
+		case 6:
+			setPanCamera(_geometry.prismaticTable6);
+			break;
+		case 7:
+			setPanCamera(_geometry.gameObject);
+			break;
+		case 8:
+			setPanCamera(_postures[postureFrameNumber / 5].get());
+		case 9:
+			setPanCamera(_geometry.knot);
+		default:
+			break;
+		}
 
 		_dancerShader->use();
 		_dancerShader->setMat4("projection", projection);
@@ -373,51 +585,80 @@ void FinalProject::renderFrame()
 
 		_dancerShader->setVec3("viewPosition", _cameras[activeCameraIndex]->position);
 
-		_dancerShader->setMat4("model", _postures[postureFrameNumber]->getModelMatrix());
-		_dancerShader->setVec3("material.ka", _postures[postureFrameNumber]->_phongMaterial->ka);
-		_dancerShader->setVec3("material.kd", _postures[postureFrameNumber]->_phongMaterial->kd);
-		_dancerShader->setVec3("material.ks", _postures[postureFrameNumber]->_phongMaterial->ks);
-		_dancerShader->setFloat("material.ns", _postures[postureFrameNumber]->_phongMaterial->ns);
-		_postures[postureFrameNumber++]->draw();
-		if (postureFrameNumber > 100)
-			postureFrameNumber = 0;
+		_dancerShader->setMat4("model", _postures[postureFrameNumber / 5]->getModelMatrix());
+		_dancerShader->setVec3("material.ka", _postures[postureFrameNumber / 5]->_phongMaterial->ka);
+		_dancerShader->setVec3("material.kd", _postures[postureFrameNumber / 5]->_phongMaterial->kd);
+		_dancerShader->setVec3("material.ks", _postures[postureFrameNumber / 5]->_phongMaterial->ks);
+		_dancerShader->setFloat("material.ns", _postures[postureFrameNumber / 5]->_phongMaterial->ns);
+
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glCullFace(GL_FRONT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		_depthShader->use();
+		_depthShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		_depthShader->setMat4("model", _postures[postureFrameNumber / 5]->getModelMatrix());
+		_postures[postureFrameNumber / 5]->draw();
+
+		_depthShader->setMat4("model", _wall.floor->getModelMatrix());
+		_wall.floor->draw();
+
+		_depthShader->setMat4("model", _wall.back->getModelMatrix());
+		_wall.back->draw();
+
+		_depthShader->setMat4("model", _wall.left->getModelMatrix());
+		_wall.left->draw();
+
+		_depthShader->setMat4("model", _wall.right->getModelMatrix());
+		_wall.right->draw();
+
+		_depthShader->setMat4("model", _geometry.prism->getModelMatrix());
+		_geometry.prism->draw();
+
+		_depthShader->setMat4("model", _geometry.cone->getModelMatrix());
+		_geometry.cone->draw();
+
+		_depthShader->setMat4("model", _geometry.cylinder->getModelMatrix());
+		_geometry.cylinder->draw();
+
+		_depthShader->setMat4("model", _geometry.prismaticTable4->getModelMatrix());
+		_geometry.prismaticTable4->draw();
+
+		_depthShader->setMat4("model", _geometry.cube->getModelMatrix());
+		_geometry.cube->draw();
+
+		_depthShader->setMat4("model", _geometry.prismaticTable6->getModelMatrix());
+		_geometry.prismaticTable4->draw();
+
+		if (_renderMode == RenderMode::PhongTexture)
+		{
+			_depthShader->setMat4("model", _geometry.gameObject->getModelMatrix());
+			_geometry.gameObject->draw();
+		}
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glCullFace(GL_BACK);
+
+		// reset viewport
+		glViewport(0, 0, _windowWidth, _windowHeight);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		_sphereShader->use();
+		_spotLightSphere->draw();
+
+		_dancerShader->use();
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+		_dancerShader->setInt("shadowMap", 10);
+		_postures[(postureFrameNumber += (1 * playOrder)) / 5]->draw();
+		if (postureFrameNumber == 500)
+			playOrder = -1;
+		if (postureFrameNumber == 0)
+			playOrder = 1;
 
 		_phongShader->use();
-		_phongShader->setMat4("projection", projection);
-		_phongShader->setMat4("view", view);
-
-		_phongShader->setVec3("directionalLight.direction", _directionalLight->direction);
-		_phongShader->setFloat("directionalLight.intensity", _directionalLight->intensity);
-		_phongShader->setVec3("directionalLight.color", _directionalLight->color);
-
-		_spotLight->position = _spotLightSphere->position;
-		_phongShader->setVec3("spotLight.position", _spotLight->position);
-		_phongShader->setVec3("spotLight.direction", _spotLight->direction);
-		_phongShader->setFloat("spotLight.intensity", _spotLight->intensity);
-		_phongShader->setVec3("spotLight.color", _spotLight->color);
-		_phongShader->setFloat("spotLight.angle", _spotLight->angle);
-		_phongShader->setFloat("spotLight.kc", _spotLight->kc);
-		_phongShader->setFloat("spotLight.kl", _spotLight->kl);
-		_phongShader->setFloat("spotLight.kq", _spotLight->kq);
-
-		_phongShader->setVec3("viewPosition", _cameras[activeCameraIndex]->position);
-
-		glActiveTexture(GL_TEXTURE1);
-		_texture.wood->bind();
-		glActiveTexture(GL_TEXTURE2);
-		_texture.brick->bind();
-		glActiveTexture(GL_TEXTURE3);
-		_texture.marbleBrown->bind();
-		glActiveTexture(GL_TEXTURE4);
-		_texture.marblePurple->bind();
-		glActiveTexture(GL_TEXTURE5);
-		_texture.metalBare->bind();
-		glActiveTexture(GL_TEXTURE6);
-		_texture.metalPainted->bind();
-		glActiveTexture(GL_TEXTURE7);
-		_texture.plastic->bind();
-		glActiveTexture(GL_TEXTURE8);
-		_texture.objTex[_geometry.gameObject->getTexIndex()]->bind();
 
 		_phongShader->setInt("mapKd", 1);
 		_wall.floor->setPhongShader(_phongShader);
@@ -456,11 +697,78 @@ void FinalProject::renderFrame()
 		_geometry.prismaticTable6->setPhongShader(_phongShader);
 		_geometry.prismaticTable6->draw();
 
-		_phongShader->setInt("mapKd", 8);
-		_geometry.gameObject->setPhongShader(_phongShader);
-		_geometry.gameObject->draw();
+		if (_renderMode == RenderMode::PhongTexture)
+		{
+			_phongShader->setInt("mapKd", 8);
+			_geometry.gameObject->setPhongShader(_phongShader);
+			_geometry.gameObject->draw();
+		}
 
 		_skybox->draw(projection, view);
+
+		if (_renderMode == RenderMode::AlphaBlending)
+			renderWithAlphaBlending(_geometry.gameObject);
+		renderWithAlphaBlending(_geometry.knot);
+	}
+
+	if (gameMode)
+	{
+
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glCullFace(GL_FRONT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		_depthShader->use();
+		_depthShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		_depthShader->setMat4("model", _wall.floor->getModelMatrix());
+		_wall.floor->draw();
+
+		if (_renderMode == RenderMode::PhongTexture)
+		{
+			_depthShader->setMat4("model", _geometry.gameObject->getModelMatrix());
+			_geometry.gameObject->draw();
+		}
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glCullFace(GL_BACK);
+
+		// reset viewport
+		glViewport(0, 0, _windowWidth, _windowHeight);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		_sphereShader->use();
+		_spotLightSphere->draw();
+
+		_phongShader->use();
+
+		glActiveTexture(GL_TEXTURE1);
+		_texture.table->bind();
+		glActiveTexture(GL_TEXTURE2);
+		_texture.objTex[_geometry.gameObject->getTexIndex()]->bind();
+
+		_phongShader->setInt("mapKd", 1);
+		_wall.floor->setPhongShader(_phongShader);
+		_wall.floor->draw();
+
+		if (_renderMode == RenderMode::PhongTexture)
+		{
+			_phongShader->setInt("mapKd", 2);
+			_geometry.gameObject->setPhongShader(_phongShader);
+			_geometry.gameObject->draw();
+		}
+
+		gameSkybox->draw(projection, view);
+
+		if (_renderMode == RenderMode::AlphaBlending)
+			renderWithAlphaBlending(_geometry.gameObject);
+
+		_frameShader->use();
+		_frameShader->setMat4("projection", projection);
+		_frameShader->setMat4("view", view);
+		_frameShader->setMat4("model", _geometry.gameObject->getModelMatrix());
+		_geometry.gameObject->drawFrame(_frameShader);
 	}
 
 	// draw ui elements
@@ -597,9 +905,122 @@ void FinalProject::renderFrame()
 			ImGui::TreePop();
 			ImGui::Separator();
 		}
+		if (ImGui::TreeNode("dancer"))
+		{
+			if (ImGui::Button("pan to it##8") == true)
+				panIndex = ((panIndex == 0) ? 8 : 0);
+			ImGui::TreePop();
+			ImGui::Separator();
+		}
+		if (ImGui::TreeNode("knot"))
+		{
+			ImGui::SliderFloat3("position##9", (float *)&_geometry.knot->position, -4.0f, 4.0f);
+			ImGui::SliderFloat3("rotation##9", (float *)&_geometry.knot->rotateangle, -4.0f, 4.0f);
+			ImGui::SliderFloat3("scale##9", (float *)&_geometry.knot->scale, 0.1f, 2.0f);
+			ImGui::SliderFloat3("albedo##9", (float *)&_knotMaterial->albedo, 0.0f, 1.0f);
+			ImGui::SliderFloat("ka##9", (float *)&_knotMaterial->ka, 0.0f, 1.0f);
+			ImGui::ColorEdit3("kd##9", (float *)&_knotMaterial->kd);
+			ImGui::SliderFloat("transparent##9", &_knotMaterial->transparent, 0.0f, 1.0f);
+			if (ImGui::Button("save as .obj file##9") == true)
+				_geometry.knot->saveAsObjFile("knot");
+			if (ImGui::Button("pan to it##9") == true)
+				panIndex = ((panIndex == 0) ? 9 : 0);
+			ImGui::TreePop();
+			ImGui::Separator();
+		}
+		if (ImGui::TreeNode("diy model"))
+		{
+			ImGui::RadioButton("Phong Texture", (int *)&_renderMode, (int)(RenderMode::PhongTexture));
+			ImGui::RadioButton("Alpha Blending", (int *)&_renderMode, (int)(RenderMode::AlphaBlending));
+			ImGui::SliderFloat3("position##7", (float *)&_geometry.gameObject->position, -4.0f, 4.0f);
+			ImGui::SliderFloat3("rotation##7", (float *)&_geometry.gameObject->rotateangle, -4.0f, 4.0f);
+			ImGui::SliderFloat3("scale##7", (float *)&_geometry.gameObject->scale, 0.1f, 2.0f);
+			if (_renderMode == RenderMode::PhongTexture)
+			{
+				ImGui::ColorEdit3("ka##7", (float *)&_geometry.gameObject->_phongMaterial->ka);
+				ImGui::ColorEdit3("kd##7", (float *)&_geometry.gameObject->_phongMaterial->kd);
+				ImGui::ColorEdit3("ks##7", (float *)&_geometry.gameObject->_phongMaterial->ks);
+				ImGui::SliderFloat("ns##7", (float *)&_geometry.gameObject->_phongMaterial->ns, 1.0f, 20.0f);
+			}
+			else
+			{
+				ImGui::SliderFloat3("albedo##9", (float *)&_diyMaterial->albedo, 0.0f, 1.0f);
+				ImGui::SliderFloat("ka##9", (float *)&_diyMaterial->ka, 0.0f, 1.0f);
+				ImGui::ColorEdit3("kd##9", (float *)&_diyMaterial->kd);
+				ImGui::SliderFloat("transparent##9", &_diyMaterial->transparent, 0.0f, 1.0f);
+			}
+			if (ImGui::Button("save to file") == true)
+				_geometry.gameObject->save_file("../output/DIYmodel.txt");
+			if (ImGui::Button("load from file") == true)
+			{
+				_geometry.gameObject->load_from_file("../output/DIYmodel.txt");
+				_geometry.gameObject->remake();
+			}
+			if (ImGui::Button("pan to it##7") == true)
+				panIndex = ((panIndex == 0) ? 7 : 0);
+			ImGui::TreePop();
+			ImGui::Separator();
+		}
 		ImGui::Checkbox("open collision detection", &opencd);
 		if (ImGui::Button("screenshot##1") == true)
 			screenShot();
+		if (ImGui::Button("start to make your own china##2") == true)
+		{
+			_geometry.gameObject->position = glm::vec3{0.0f, 0.0f, 0.0f};
+			_geometry.gameObject->scale = glm::vec3{0.5f, 0.5f, 0.5f};
+			_geometry.gameObject->rotation = {1.0f, 0.0f, 0.0f, 0.0f};
+			_geometry.gameObject->rotateangle = glm::vec3{0.0f, 0.0f, 0.0f};
+			gameMode = true;
+			setPanCamera(_geometry.gameObject);
+		}
+		ImGui::End();
+	}
+	else if (gameMode)
+	{
+
+		ImGui::RadioButton("Phong Texture", (int *)&_renderMode, (int)(RenderMode::PhongTexture));
+		ImGui::RadioButton("Alpha Blending", (int *)&_renderMode, (int)(RenderMode::AlphaBlending));
+		if (_renderMode == RenderMode::PhongTexture)
+		{
+			ImGui::ColorEdit3("ka##7", (float *)&_geometry.gameObject->_phongMaterial->ka);
+			ImGui::ColorEdit3("kd##7", (float *)&_geometry.gameObject->_phongMaterial->kd);
+			ImGui::ColorEdit3("ks##7", (float *)&_geometry.gameObject->_phongMaterial->ks);
+			ImGui::SliderFloat("ns##7", (float *)&_geometry.gameObject->_phongMaterial->ns, 1.0f, 20.0f);
+		}
+		else
+		{
+			ImGui::SliderFloat3("albedo##9", (float *)&_diyMaterial->albedo, 0.0f, 1.0f);
+			ImGui::SliderFloat("ka##9", (float *)&_diyMaterial->ka, 0.0f, 1.0f);
+			ImGui::ColorEdit3("kd##9", (float *)&_diyMaterial->kd);
+			ImGui::SliderFloat("transparent##9", &_diyMaterial->transparent, 0.0f, 1.0f);
+		}
+		ImGui::Checkbox("open collision detection", &opencd);
+		if (ImGui::Button("save to file") == true)
+			_geometry.gameObject->save_file("../output/DIYmodel.txt");
+		if (ImGui::Button("load from file") == true)
+		{
+			_geometry.gameObject->load_from_file("../output/DIYmodel.txt");
+			_geometry.gameObject->remake();
+		}
+		if (ImGui::Button("reset camera##2") == true)
+			setPanCamera(_geometry.gameObject);
+		if (ImGui::Button("screenshot##1") == true)
+			screenShot();
+		if (ImGui::Button("finish edit##3") == true)
+		{
+			_geometry.gameObject->position = glm::vec3{0.0f, 0.0f, 0.0f};
+			_geometry.gameObject->scale = glm::vec3{0.2f, 0.2f, 0.2f};
+			_geometry.gameObject->rotation = {1.0f, 0.0f, 0.0f, 0.0f};
+			_geometry.gameObject->rotateangle = glm::vec3{0.0f, 0.0f, 0.0f};
+			gameMode = false;
+			const float aspect = 1.0f * _windowWidth / _windowHeight;
+			constexpr float znear = 0.1f;
+			constexpr float zfar = 10000.0f;
+			_cameras[0] = new PerspectiveCamera(
+				glm::radians(60.0f), aspect, 0.1f, 10000.0f);
+			_cameras[0]->position = glm::vec3(0.0f, 0.0f, 15.0f);
+		}
+
 		ImGui::End();
 	}
 
@@ -618,16 +1039,21 @@ void FinalProject::initPhongShader()
 		"out vec3 fPosition;\n"
 		"out vec3 fNormal;\n"
 		"out vec2 fTexCoord;\n"
+		"out vec3 fFragPos;\n"
+		"out vec4 fFragPosLightSpace;\n"
 
 		"uniform mat4 model;\n"
 		"uniform mat4 view;\n"
 		"uniform mat4 projection;\n"
+		"uniform mat4 lightSpaceMatrix;\n"
 
 		"void main() {\n"
 		"	fPosition = vec3(model * vec4(aPosition, 1.0f));\n"
 		"	fNormal = mat3(transpose(inverse(model))) * aNormal;\n"
 		"	fTexCoord = aTexCoord;\n"
 		"	gl_Position = projection * view * model * vec4(aPosition, 1.0f);\n"
+		"	fFragPos = vec3(model * vec4(aPosition, 1.0));\n"
+		"	fFragPosLightSpace = lightSpaceMatrix * vec4(fFragPos, 1.0);\n"
 		"}\n";
 
 	const char *fsCode =
@@ -635,6 +1061,8 @@ void FinalProject::initPhongShader()
 		"in vec3 fPosition;\n"
 		"in vec3 fNormal;\n"
 		"in vec2 fTexCoord;\n"
+		"in vec3 fFragPos;\n"
+		"in vec4 fFragPosLightSpace;\n"
 		"out vec4 color;\n"
 
 		"struct Material {\n"
@@ -666,6 +1094,32 @@ void FinalProject::initPhongShader()
 		"uniform SpotLight spotLight;\n"
 		"uniform vec3 viewPosition;\n"
 		"uniform sampler2D mapKd;\n"
+		"uniform sampler2D shadowMap;\n"
+
+		"float ShadowCalculation(vec4 fragPosLightSpace, float bias)\n"
+		"{"
+		"	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;\n"
+		"	projCoords = projCoords * 0.5 + 0.5;\n"
+		"	float closestDepth = texture(shadowMap, projCoords.xy).r;\n"
+		"	float currentDepth = projCoords.z;\n"
+
+		"	float shadow = 0.0;\n"
+		"	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);\n"
+		"	for (int x = -1; x <= 1; ++x)\n"
+		"	{\n"
+		"		for (int y = -1; y <= 1; ++y)\n"
+		"		{\n"
+		"			float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;\n"
+		"			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;\n"
+		"		}\n"
+		"	}\n"
+		"	shadow /= 9.0;\n"
+
+		"	if (projCoords.z > 1.0)\n"
+		"		shadow = 0.0;\n"
+
+		"	return shadow;\n"
+		"}\n"
 
 		"vec3 calcDirectionalLight(vec3 normal, vec3 viewDir) {\n"
 		"	vec3 ambient = directionalLight.intensity * directionalLight.color * material.ka * texture(mapKd, fTexCoord).rgb;\n"
@@ -677,8 +1131,10 @@ void FinalProject::initPhongShader()
 		"	vec3 reflectDir = reflect(-lightDir, normal);\n"
 		"	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.ns);\n"
 		"	vec3 specular = directionalLight.intensity * directionalLight.color * spec * material.ks;\n"
-
-		"	return (ambient + diffuse + specular);\n"
+		"	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  "
+		"	float shadow = 0;"
+		"	shadow = ShadowCalculation(fFragPosLightSpace,bias); "
+		"	return (ambient + (1.0 - shadow) * (diffuse + specular));\n"
 		"}\n"
 
 		"vec3 calcSpotLight(vec3 normal, vec3 viewDir) {\n"
@@ -696,12 +1152,16 @@ void FinalProject::initPhongShader()
 		"		vec3 reflectDir = reflect(-lightDir, normal);\n"
 		"		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.ns);\n"
 		"		vec3 specular = spotLight.color * spec * material.ks * spotLight.intensity * attenuation;\n"
-
-		"		return (ambient + diffuse + specular);\n"
+		"		float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  "
+		"		float shadow = 0;"
+		"		shadow = ShadowCalculation(fFragPosLightSpace,bias); "
+		"		return (ambient + (1.0 - shadow) * (diffuse + specular));\n"
 		"	}\n"
 		"	else {\n"
 		"		vec3 ambient = spotLight.color *  material.ka * spotLight.intensity * attenuation * texture(mapKd, fTexCoord).rgb;\n"
-
+		"		float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  "
+		"		float shadow = 0;"
+		"		shadow = ShadowCalculation(fFragPosLightSpace,bias); "
 		"		return ambient;\n"
 		"	}\n"
 		"}\n"
@@ -717,6 +1177,25 @@ void FinalProject::initPhongShader()
 	_phongShader->attachVertexShader(vsCode);
 	_phongShader->attachFragmentShader(fsCode);
 	_phongShader->link();
+
+	glGenFramebuffers(1, &depthMapFBO);
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	GLfloat borderColor[] = {1.0, 1.0, 1.0, 1.0};
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void FinalProject::initSphereShader()
@@ -759,21 +1238,28 @@ void FinalProject::initDancerShader()
 
 		"out vec3 fPosition;\n"
 		"out vec3 fNormal;\n"
+		"out vec3 fFragPos;\n"
+		"out vec4 fFragPosLightSpace;\n"
 
 		"uniform mat4 model;\n"
 		"uniform mat4 view;\n"
 		"uniform mat4 projection;\n"
+		"uniform mat4 lightSpaceMatrix;\n"
 
 		"void main() {\n"
 		"	fPosition = vec3(model * vec4(aPosition, 1.0f));\n"
 		"	fNormal = mat3(transpose(inverse(model))) * aNormal;\n"
 		"	gl_Position = projection * view * model * vec4(aPosition, 1.0f);\n"
+		"	fFragPos = vec3(model * vec4(aPosition, 1.0));\n"
+		"	fFragPosLightSpace = lightSpaceMatrix * vec4(fFragPos, 1.0);\n"
 		"}\n";
 
 	const char *fsCode =
 		"#version 330 core\n"
 		"in vec3 fPosition;\n"
 		"in vec3 fNormal;\n"
+		"in vec3 fFragPos;\n"
+		"in vec4 fFragPosLightSpace;\n"
 		"out vec4 color;\n"
 
 		"struct Material {\n"
@@ -804,6 +1290,32 @@ void FinalProject::initDancerShader()
 		"uniform DirectionalLight directionalLight;\n"
 		"uniform SpotLight spotLight;\n"
 		"uniform vec3 viewPosition;\n"
+		"uniform sampler2D shadowMap;\n"
+
+		"float ShadowCalculation(vec4 fragPosLightSpace, float bias)\n"
+		"{"
+		"	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;\n"
+		"	projCoords = projCoords * 0.5 + 0.5;\n"
+		"	float closestDepth = texture(shadowMap, projCoords.xy).r;\n"
+		"	float currentDepth = projCoords.z;\n"
+
+		"	float shadow = 0.0;\n"
+		"	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);\n"
+		"	for (int x = -1; x <= 1; ++x)\n"
+		"	{\n"
+		"		for (int y = -1; y <= 1; ++y)\n"
+		"		{\n"
+		"			float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;\n"
+		"			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;\n"
+		"		}\n"
+		"	}\n"
+		"	shadow /= 9.0;\n"
+
+		"	if (projCoords.z > 1.0)\n"
+		"		shadow = 0.0;\n"
+
+		"	return shadow;\n"
+		"}\n"
 
 		"vec3 calcDirectionalLight(vec3 normal, vec3 viewDir) {\n"
 		"	vec3 ambient = directionalLight.intensity * directionalLight.color * material.ka;\n"
@@ -816,7 +1328,10 @@ void FinalProject::initDancerShader()
 		"	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.ns);\n"
 		"	vec3 specular = directionalLight.intensity * directionalLight.color * spec * material.ks;\n"
 
-		"	return (ambient + diffuse + specular);\n"
+		"	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  "
+		"	float shadow = 0;"
+		"	shadow = ShadowCalculation(fFragPosLightSpace,bias); "
+		"	return (ambient + (1.0 - shadow) * (diffuse + specular));\n"
 		"}\n"
 
 		"vec3 calcSpotLight(vec3 normal, vec3 viewDir) {\n"
@@ -835,7 +1350,10 @@ void FinalProject::initDancerShader()
 		"		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.ns);\n"
 		"		vec3 specular = spotLight.color * spec * material.ks * spotLight.intensity * attenuation;\n"
 
-		"		return (ambient + diffuse + specular);\n"
+		"	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  "
+		"	float shadow = 0;"
+		"	shadow = ShadowCalculation(fFragPosLightSpace,bias); "
+		"	return (ambient + (1.0 - shadow) * (diffuse + specular));\n"
 		"	}\n"
 		"	else {\n"
 		"		vec3 ambient = spotLight.color *  material.ka * spotLight.intensity * attenuation;\n"
@@ -855,6 +1373,65 @@ void FinalProject::initDancerShader()
 	_dancerShader->attachVertexShader(vsCode);
 	_dancerShader->attachFragmentShader(fsCode);
 	_dancerShader->link();
+}
+
+void FinalProject::initFrameShader()
+{
+	const char *vsCode =
+		"#version 330 core\n"
+		"layout(location = 0) in vec3 aPos;\n"
+
+		"uniform mat4 model;\n"
+		"uniform mat4 view;\n"
+		"uniform mat4 projection;\n"
+
+		"void main()\n"
+		"{\n"
+		"	gl_Position = projection * view * model * (vec4(aPos, 1.0));\n"
+		"}\n";
+
+	const char *fsCode =
+		"#version 330 core\n"
+		"out vec4 FragColor;\n"
+
+		"uniform vec3 color;\n"
+
+		"void main()\n"
+		"{\n"
+		"	FragColor = vec4(color, 1.0);\n"
+		"}\n";
+
+	_frameShader = new GLSLProgram;
+	_frameShader->attachVertexShader(vsCode);
+	_frameShader->attachFragmentShader(fsCode);
+	_frameShader->link();
+}
+
+void FinalProject::initDepthShader()
+{
+	const char *vsCode =
+		"#version 330 core\n"
+		"layout (location = 0) in vec3 aPos;\n"
+
+		"uniform mat4 lightSpaceMatrix;\n"
+		"uniform mat4 model;\n"
+
+		"void main()\n"
+		"{\n"
+		"	gl_Position = lightSpaceMatrix * model * vec4(aPos, 1.0);\n"
+		"}\n";
+
+	const char *fsCode =
+		"#version 330 core\n"
+
+		"void main()\n"
+		"{\n"
+		"}\n";
+
+	_depthShader = new GLSLProgram;
+	_depthShader->attachVertexShader(vsCode);
+	_depthShader->attachFragmentShader(fsCode);
+	_depthShader->link();
 }
 
 void FinalProject::screenShot()
@@ -886,19 +1463,492 @@ void FinalProject::setPanCamera(Model *model)
 	_cameras[activeCameraIndex]->rotation = glm::quat{cos(-0.25f), model->getRight().x * sin(-0.25f), model->getRight().y * sin(-0.25f), model->getRight().z * sin(-0.25f)} * _cameras[activeCameraIndex]->rotation;
 }
 
+void FinalProject::setPanCamera(DIYmodel *model)
+{
+	if (!gameMode)
+	{
+		_cameras[activeCameraIndex]->position = model->position + model->getFront() * -5.0f + model->getUp() * 5.0f;
+		_cameras[activeCameraIndex]->rotation = glm::quat{1.0f, 0.0f, 0.0f, 0.0f};
+		_cameras[activeCameraIndex]->rotation = glm::quat{cos(model->rotateangle.x / 2.0f), model->oldright.x * sin(model->rotateangle.x / 2.0f), model->oldright.y * sin(model->rotateangle.x / 2.0f), model->oldright.z * sin(model->rotateangle.x / 2.0f)} * _cameras[activeCameraIndex]->rotation;
+		_cameras[activeCameraIndex]->rotation = glm::quat{cos(model->rotateangle.y / 2.0f), model->oldup.x * sin(model->rotateangle.y / 2.0f), model->oldup.y * sin(model->rotateangle.y / 2.0f), model->oldup.z * sin(model->rotateangle.y / 2.0f)} * _cameras[activeCameraIndex]->rotation;
+		_cameras[activeCameraIndex]->rotation = glm::quat{cos(model->rotateangle.z / 2.0f), -model->oldfront.x * sin(model->rotateangle.z / 2.0f), -model->oldfront.y * sin(model->rotateangle.z / 2.0f), -model->oldfront.z * sin(model->rotateangle.z / 2.0f)} * _cameras[activeCameraIndex]->rotation;
+		_cameras[activeCameraIndex]->rotation = glm::quat{cos(-0.25f), model->getRight().x * sin(-0.25f), model->getRight().y * sin(-0.25f), model->getRight().z * sin(-0.25f)} * _cameras[activeCameraIndex]->rotation;
+	}
+	if (gameMode)
+	{
+		_cameras[activeCameraIndex]->position = model->position + model->getFront() * -10.0f + model->getUp() * 3.0f;
+		_cameras[activeCameraIndex]->rotation = glm::quat{1.0f, 0.0f, 0.0f, 0.0f};
+		_cameras[activeCameraIndex]->rotation = glm::quat{cos(model->rotateangle.x / 2.0f), model->oldright.x * sin(model->rotateangle.x / 2.0f), model->oldright.y * sin(model->rotateangle.x / 2.0f), model->oldright.z * sin(model->rotateangle.x / 2.0f)} * _cameras[activeCameraIndex]->rotation;
+		_cameras[activeCameraIndex]->rotation = glm::quat{cos(model->rotateangle.y / 2.0f), model->oldup.x * sin(model->rotateangle.y / 2.0f), model->oldup.y * sin(model->rotateangle.y / 2.0f), model->oldup.z * sin(model->rotateangle.y / 2.0f)} * _cameras[activeCameraIndex]->rotation;
+		_cameras[activeCameraIndex]->rotation = glm::quat{cos(model->rotateangle.z / 2.0f), -model->oldfront.x * sin(model->rotateangle.z / 2.0f), -model->oldfront.y * sin(model->rotateangle.z / 2.0f), -model->oldfront.z * sin(model->rotateangle.z / 2.0f)} * _cameras[activeCameraIndex]->rotation;
+	}
+}
+
 bool FinalProject::isInBoundingBoxGlobal(Camera *camera)
 {
-	if (_wall.floor->isInBoundingBoxGlobal(camera) ||
-		_wall.back->isInBoundingBoxGlobal(camera) ||
-		_wall.left->isInBoundingBoxGlobal(camera) ||
-		_wall.right->isInBoundingBoxGlobal(camera) ||
-		_geometry.cylinder->isInBoundingBoxGlobal(camera) ||
-		_geometry.cone->isInBoundingBoxGlobal(camera) ||
-		_geometry.prism->isInBoundingBoxGlobal(camera) ||
-		_geometry.cube->isInBoundingBoxGlobal(camera) ||
-		_geometry.prismaticTable4->isInBoundingBoxGlobal(camera) ||
-		_geometry.prismaticTable6->isInBoundingBoxGlobal(camera))
+	if (!gameMode && (_wall.floor->isInBoundingBoxGlobal(camera) ||
+					  _wall.back->isInBoundingBoxGlobal(camera) ||
+					  _wall.left->isInBoundingBoxGlobal(camera) ||
+					  _wall.right->isInBoundingBoxGlobal(camera) ||
+					  _geometry.cylinder->isInBoundingBoxGlobal(camera) ||
+					  _geometry.cone->isInBoundingBoxGlobal(camera) ||
+					  _geometry.prism->isInBoundingBoxGlobal(camera) ||
+					  _geometry.cube->isInBoundingBoxGlobal(camera) ||
+					  _geometry.prismaticTable4->isInBoundingBoxGlobal(camera) ||
+					  _geometry.prismaticTable6->isInBoundingBoxGlobal(camera) ||
+					  _geometry.gameObject->isInBoundingBoxGlobal(camera) ||
+					  _postures[postureFrameNumber / 5]->isInBoundingBoxGlobal(camera) ||
+					  _geometry.knot->isInBoundingBoxGlobal(camera)))
+		return true;
+	else if (gameMode && (_wall.floor->isInBoundingBoxGlobal(camera) ||
+						  _geometry.gameObject->isInBoundingBoxGlobal(camera)))
 		return true;
 	else
 		return false;
+}
+
+void FinalProject::initDepthPeelingShaders()
+{
+	const char *shadeVsCode =
+		"#version 330 core\n"
+		"layout(location = 0) in vec3 aPosition;\n"
+		"layout(location = 1) in vec3 aNormal;\n"
+		"layout(location = 2) in vec2 aTexCoord;\n"
+
+		"out vec3 fPos;\n"
+		"out vec3 fNormal;\n"
+
+		"uniform mat4 projection;\n"
+		"uniform mat4 view;\n"
+		"uniform mat4 model;\n"
+
+		"void main() {\n"
+		"	fPos = vec3(model * vec4(aPosition, 1.0f));\n"
+		"	fNormal = mat3(transpose(inverse(model))) * aNormal;\n"
+		"	gl_Position = projection * view * model * vec4(aPosition, 1.0f);\n"
+		"}\n";
+
+	const char *blendVsCode =
+		"#version 330 core\n"
+		"layout(location = 0) in vec2 aPosition;\n"
+		"layout(location = 1) in vec2 aTexCoords;\n"
+		"out vec2 fTexCoords;\n"
+		"void main() {\n"
+		"	fTexCoords = aTexCoords;\n"
+		"	gl_Position = vec4(aPosition, 0.0f, 1.0f);\n"
+		"}\n";
+
+	const char *initFsCode =
+		"#version 330 core\n"
+		"in vec3 fPos;\n"
+		"in vec3 fNormal;\n"
+		"out vec4 color;\n"
+
+		"struct Material {\n"
+		"	vec3 albedo;\n"
+		"	float ka;\n"
+		"	vec3 kd;\n"
+		"	float transparent;\n"
+		"};\n"
+
+		"struct DirectionalLight {\n"
+		"	vec3 direction;\n"
+		"	float intensity;\n"
+		"	vec3 color;\n"
+		"};\n"
+
+		"uniform Material material;\n"
+		"uniform DirectionalLight directionalLight;\n"
+
+		"vec3 lambertShading() {\n"
+		"	vec3 normal = normalize(fNormal);\n"
+		"	if (!gl_FrontFacing) { \n"
+		"		normal = -normal;\n"
+		"	}\n"
+		"	vec3 lightDir = normalize(-directionalLight.direction);\n"
+		"	vec3 ambient = material.ka * material.albedo ;\n"
+		"	vec3 diffuse = material.kd * max(dot(lightDir, normal), 0.0f) * \n"
+		"				   directionalLight.color * directionalLight.intensity;\n"
+		"	return ambient + diffuse;\n"
+		"}\n"
+
+		"void main() {\n"
+		"	vec3 premultiedColor = lambertShading() * material.transparent;\n"
+		"	color = vec4(premultiedColor, 1.0f - material.transparent);\n"
+		"}\n";
+
+	const char *peelFsCode =
+		"#version 330 core\n"
+		"in vec3 fPos;\n"
+		"in vec3 fNormal;\n"
+		"out vec4 color;\n"
+
+		"struct Material {\n"
+		"	vec3 albedo;\n"
+		"	float ka;\n"
+		"	vec3 kd;\n"
+		"	float transparent;\n"
+		"};\n"
+
+		"struct DirectionalLight {\n"
+		"	vec3 direction;\n"
+		"	float intensity;\n"
+		"	vec3 color;\n"
+		"};\n"
+
+		"struct WindowExtent {\n"
+		"	int width;\n"
+		"	int height;\n"
+		"};\n"
+
+		"uniform Material material;\n"
+		"uniform DirectionalLight directionalLight;\n"
+		"uniform sampler2D depthTexture;\n"
+		"uniform WindowExtent windowExtent;\n"
+
+		"float getPeelingDepth() {\n"
+		"	float u = gl_FragCoord.x / windowExtent.width;\n"
+		"	float v = gl_FragCoord.y / windowExtent.height;\n"
+		"	return texture(depthTexture, vec2(u, v)).r;\n"
+		"}\n"
+
+		"vec3 lambertShading() {\n"
+		"	vec3 normal = normalize(fNormal);\n"
+		"	if (!gl_FrontFacing) { \n"
+		"		normal = -normal;\n"
+		"	}\n"
+		"	vec3 lightDir = normalize(-directionalLight.direction);\n"
+		"	vec3 ambient = material.ka * material.albedo ;\n"
+		"	vec3 diffuse = material.kd * max(dot(lightDir, normal), 0.0f) * \n"
+		"				   directionalLight.color * directionalLight.intensity;\n"
+		"	return ambient + diffuse;\n"
+		"}\n"
+
+		"void main() {\n"
+		"	if (gl_FragCoord.z <= getPeelingDepth()) {\n"
+		"		discard;\n"
+		"	}\n"
+
+		"	vec3 premultiedColor = lambertShading() * material.transparent;\n"
+		"	color = vec4(premultiedColor, material.transparent);\n"
+		"}\n";
+
+	const char *blendFsCode =
+		"#version 330 core\n"
+		"out vec4 color;\n"
+
+		"struct WindowExtent {\n"
+		"	int width;\n"
+		"	int height;\n"
+		"};\n"
+
+		"uniform WindowExtent windowExtent;\n"
+		"uniform sampler2D blendTexture;\n"
+
+		"void main() {\n"
+		"	float u = gl_FragCoord.x / windowExtent.width;\n"
+		"	float v = gl_FragCoord.y / windowExtent.height;\n"
+		"	color = texture(blendTexture, vec2(u, v));\n"
+		"}\n";
+
+	const char *finalFsCode =
+		"#version 330 core\n"
+		"out vec4 color;\n"
+
+		"struct WindowExtent {\n"
+		"	int width;\n"
+		"	int height;\n"
+		"};\n"
+
+		"uniform WindowExtent windowExtent;\n"
+		"uniform sampler2D blendTexture;\n"
+		"uniform vec4 backgroundColor;\n"
+
+		"void main() {\n"
+		"	float u = gl_FragCoord.x / windowExtent.width;\n"
+		"	float v = gl_FragCoord.y / windowExtent.height;\n"
+		"	vec4 frontColor = texture(blendTexture, vec2(u, v));\n"
+		"	color = frontColor + backgroundColor * frontColor.a;\n"
+		"}\n";
+
+	_depthPeelingInitShader.reset(new GLSLProgram);
+	_depthPeelingInitShader->attachVertexShader(shadeVsCode);
+	_depthPeelingInitShader->attachFragmentShader(initFsCode);
+	_depthPeelingInitShader->link();
+
+	_depthPeelingShader.reset(new GLSLProgram);
+	_depthPeelingShader->attachVertexShader(shadeVsCode);
+	_depthPeelingShader->attachFragmentShader(peelFsCode);
+	_depthPeelingShader->link();
+
+	_depthPeelingBlendShader.reset(new GLSLProgram);
+	_depthPeelingBlendShader->attachVertexShader(blendVsCode);
+	_depthPeelingBlendShader->attachFragmentShader(blendFsCode);
+	_depthPeelingBlendShader->link();
+
+	_depthPeelingFinalShader.reset(new GLSLProgram);
+	_depthPeelingFinalShader->attachVertexShader(blendVsCode);
+	_depthPeelingFinalShader->attachFragmentShader(finalFsCode);
+	_depthPeelingFinalShader->link();
+}
+
+void FinalProject::initDepthPeelingResources()
+{
+	// init materials
+	_knotMaterial.reset(new TransparentMaterial());
+	_knotMaterial->albedo = glm::vec3(1.0f, 1.0f, 1.0f);
+	_knotMaterial->ka = 0.03f;
+	_knotMaterial->kd = glm::vec3(1.0f, 1.0f, 1.0f);
+	_knotMaterial->transparent = 0.6f;
+
+	_diyMaterial.reset(new TransparentMaterial());
+	_diyMaterial->albedo = glm::vec3(1.0f, 1.0f, 1.0f);
+	_diyMaterial->ka = 0.03f;
+	_diyMaterial->kd = glm::vec3(1.0f, 1.0f, 1.0f);
+	_diyMaterial->transparent = 0.6f;
+
+	// init fullscreen quad
+	_fullscreenQuad.reset(new FullscreenQuad);
+
+	for (int i = 0; i < 2; ++i)
+	{
+		_fbos[i].reset(new Framebuffer);
+		_colorTextures[i].reset(
+			new DataTexture2D(GL_RGBA, _windowWidth, _windowHeight, GL_RGBA, GL_FLOAT));
+		_depthTextures[i].reset(
+			new DataTexture2D(GL_DEPTH_COMPONENT32F, _windowWidth, _windowHeight, GL_DEPTH_COMPONENT, GL_FLOAT));
+
+		_fbos[i]->bind();
+		_fbos[i]->attach(*_colorTextures[i], GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D);
+		_fbos[i]->attach(*_depthTextures[i], GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D);
+		_fbos[i]->unbind();
+	}
+
+	_colorBlendTexture.reset(new DataTexture2D(GL_RGBA, _windowWidth, _windowHeight, GL_RGBA, GL_FLOAT));
+	_colorBlendFbo.reset(new Framebuffer);
+	_colorBlendFbo->bind();
+	_colorBlendFbo->attach(*_colorBlendTexture, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D);
+	_colorBlendFbo->attach(*_depthTextures[0], GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D);
+	_colorBlendFbo->unbind();
+}
+
+void FinalProject::renderWithDepthPeeling(Model *model)
+{
+	const glm::mat4 projection = _cameras[activeCameraIndex]->getProjectionMatrix();
+	const glm::mat4 view = _cameras[activeCameraIndex]->getViewMatrix();
+
+	// 1. initialize min depth buffer
+	_colorBlendFbo->bind();
+
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+
+	_depthPeelingInitShader->use();
+	// 1.1 set transformation matrices
+	_depthPeelingInitShader->setMat4("projection", projection);
+	_depthPeelingInitShader->setMat4("view", view);
+	_depthPeelingInitShader->setMat4("model", model->getModelMatrix());
+	// 1.2 set light
+	_depthPeelingInitShader->setVec3("directionalLight.direction", _directionalLight->direction);
+	_depthPeelingInitShader->setFloat("directionalLight.intensity", _directionalLight->intensity);
+	_depthPeelingInitShader->setVec3("directionalLight.color", _directionalLight->color);
+	// 1.3 set material
+	_depthPeelingInitShader->setVec3("material.albedo", _knotMaterial->albedo);
+	_depthPeelingInitShader->setFloat("material.ka", _knotMaterial->ka);
+	_depthPeelingInitShader->setVec3("material.kd", _knotMaterial->kd);
+	_depthPeelingInitShader->setFloat("material.transparent", _knotMaterial->transparent);
+
+	model->draw();
+
+	for (int i = 1; i < 4; ++i)
+	{
+
+		_depthPeelingShader->use();
+		_depthPeelingShader->setMat4("projection", projection);
+		_depthPeelingShader->setMat4("view", view);
+		_depthPeelingShader->setMat4("model", model->getModelMatrix());
+		_depthPeelingShader->setVec3("directionalLight.direction", _directionalLight->direction);
+		_depthPeelingShader->setFloat("directionalLight.intensity", _directionalLight->intensity);
+		_depthPeelingShader->setVec3("directionalLight.color", _directionalLight->color);
+		_depthPeelingShader->setVec3("material.albedo", _knotMaterial->albedo);
+		_depthPeelingShader->setFloat("material.ka", _knotMaterial->ka);
+		_depthPeelingShader->setVec3("material.kd", _knotMaterial->kd);
+		_depthPeelingShader->setFloat("material.transparent", _knotMaterial->transparent);
+		_depthPeelingShader->setInt("windowExtent.width", _windowWidth);
+		_depthPeelingShader->setInt("windowExtent.height", _windowHeight);
+
+		glEnable(GL_DEPTH_TEST);
+
+		_fbos[i % 2]->bind();
+		glClearColor(_clearColor.r, _clearColor.g, _clearColor.b, _clearColor.a);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//_fbos[(i + 1) % 2]->bind();
+		_depthTextures[(i + 1) % 2]->bind(0);
+		model->draw();
+
+		_colorBlendFbo->bind();
+		_colorTextures[i % 2]->bind(0);
+		_depthPeelingBlendShader->use();
+		_depthPeelingBlendShader->setInt("blendTexture", 0);
+		_depthPeelingBlendShader->setInt("windowExtent.width", _windowWidth);
+		_depthPeelingBlendShader->setInt("windowExtent.height", _windowHeight);
+
+		glEnable(GL_BLEND);
+		glDisable(GL_DEPTH_TEST);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFuncSeparate(GL_DST_ALPHA, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
+
+		//_knot->draw();
+
+		_fullscreenQuad->draw();
+		glDisable(GL_BLEND);
+	}
+
+	// 3. final pass: blend the peeling result with the background color
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_DEPTH_TEST);
+	_depthPeelingFinalShader->use();
+	// 3.1 set the window extent
+	_depthPeelingFinalShader->setInt("windowExtent.width", _windowWidth);
+	_depthPeelingFinalShader->setInt("windowExtent.height", _windowHeight);
+	// 3.2 set the blend texture
+	glActiveTexture(GL_TEXTURE0);
+	_colorBlendTexture->bind();
+	// 3.3 set the background color
+	_depthPeelingFinalShader->setVec4("backgroundColor", _clearColor);
+
+	_fullscreenQuad->draw();
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+}
+
+void FinalProject::initAlphaBlendingShader()
+{
+	const char *vsCode =
+		"#version 330 core\n"
+		"layout(location = 0) in vec3 aPosition;\n"
+		"layout(location = 1) in vec3 aNormal;\n"
+		"layout(location = 2) in vec2 aTexCoord;\n"
+
+		"out vec3 fPos;\n"
+		"out vec3 fNormal;\n"
+
+		"uniform mat4 projection;\n"
+		"uniform mat4 view;\n"
+		"uniform mat4 model;\n"
+
+		"void main() {\n"
+		"	fPos = vec3(model * vec4(aPosition, 1.0f));\n"
+		"	fNormal = mat3(transpose(inverse(model))) * aNormal;\n"
+		"	gl_Position = projection * view * model * vec4(aPosition, 1.0f);\n"
+		"} \n";
+
+	const char *fsCode =
+		"#version 330 core\n"
+		"in vec3 fPos;\n"
+		"in vec3 fNormal;\n"
+		"out vec4 color;\n"
+
+		"struct Material {\n"
+		"	vec3 albedo;\n"
+		"	float ka;\n"
+		"	vec3 kd;\n"
+		"	float transparent;\n"
+		"};\n"
+
+		"struct DirectionalLight {\n"
+		"	vec3 direction;\n"
+		"	float intensity;\n"
+		"	vec3 color;\n"
+		"};\n"
+
+		"uniform Material material;\n"
+		"uniform DirectionalLight directionalLight;\n"
+
+		"void main() {\n"
+		"	vec3 normal = normalize(fNormal);\n"
+		"	vec3 lightDir = normalize(-directionalLight.direction);\n"
+		"	vec3 ambient = material.ka * material.albedo ;\n"
+		"	vec3 diffuse = material.kd * max(dot(lightDir, normal), 0.0f) * \n"
+		"				   directionalLight.color * directionalLight.intensity;\n"
+		"	color = vec4(ambient + diffuse, material.transparent);\n"
+		"}\n";
+
+	_alphaBlendingShader.reset(new GLSLProgram);
+	_alphaBlendingShader->attachVertexShader(vsCode);
+	_alphaBlendingShader->attachFragmentShader(fsCode);
+	_alphaBlendingShader->link();
+}
+
+void FinalProject::renderWithAlphaBlending(Model *model)
+{
+	//  render transparent objects
+	_alphaBlendingShader->use();
+	// 1 set transformation matrices
+	_alphaBlendingShader->setMat4("projection", _cameras[activeCameraIndex]->getProjectionMatrix());
+	_alphaBlendingShader->setMat4("view", _cameras[activeCameraIndex]->getViewMatrix());
+	_alphaBlendingShader->setMat4("model", model->getModelMatrix());
+	// 2 set light
+	_alphaBlendingShader->setVec3("directionalLight.direction", _directionalLight->direction);
+	_alphaBlendingShader->setFloat("directionalLight.intensity", _directionalLight->intensity);
+	_alphaBlendingShader->setVec3("directionalLight.color", _directionalLight->color);
+	// 3 set material
+	_alphaBlendingShader->setVec3("material.albedo", _knotMaterial->albedo);
+	_alphaBlendingShader->setFloat("material.ka", _knotMaterial->ka);
+	_alphaBlendingShader->setVec3("material.kd", _knotMaterial->kd);
+	_alphaBlendingShader->setFloat("material.transparent", _knotMaterial->transparent);
+
+	glEnable(GL_DEPTH_TEST);
+	glColorMask(false, false, false, false);
+
+	model->draw();
+
+	glColorMask(true, true, true, true);
+	glEnable(GL_BLEND);
+	glDepthFunc(GL_LEQUAL);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	model->draw();
+
+	glDisable(GL_BLEND);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
+}
+
+void FinalProject::renderWithAlphaBlending(DIYmodel *model)
+{
+	//  render transparent objects
+	_alphaBlendingShader->use();
+	// 1 set transformation matrices
+	_alphaBlendingShader->setMat4("projection", _cameras[activeCameraIndex]->getProjectionMatrix());
+	_alphaBlendingShader->setMat4("view", _cameras[activeCameraIndex]->getViewMatrix());
+	_alphaBlendingShader->setMat4("model", model->getModelMatrix());
+	// 2 set light
+	_alphaBlendingShader->setVec3("directionalLight.direction", _directionalLight->direction);
+	_alphaBlendingShader->setFloat("directionalLight.intensity", _directionalLight->intensity);
+	_alphaBlendingShader->setVec3("directionalLight.color", _directionalLight->color);
+	// 3 set material
+	_alphaBlendingShader->setVec3("material.albedo", _diyMaterial->albedo);
+	_alphaBlendingShader->setFloat("material.ka", _diyMaterial->ka);
+	_alphaBlendingShader->setVec3("material.kd", _diyMaterial->kd);
+	_alphaBlendingShader->setFloat("material.transparent", _diyMaterial->transparent);
+
+	glEnable(GL_DEPTH_TEST);
+	glColorMask(false, false, false, false);
+
+	model->draw();
+
+	glColorMask(true, true, true, true);
+	glEnable(GL_BLEND);
+	glDepthFunc(GL_LEQUAL);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	model->draw();
+
+	glDisable(GL_BLEND);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
 }

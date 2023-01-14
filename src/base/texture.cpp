@@ -166,3 +166,43 @@ void DataTexture::bind() const {
 void DataTexture::unbind() const {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+DataTexture2D::DataTexture2D(
+	GLenum internalFormat, int width, int height, GLenum format, GLenum dataType)
+{
+	glBindTexture(GL_TEXTURE_2D, _handle);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, dataType, 0);
+}
+
+DataTexture2D::DataTexture2D(DataTexture2D &&rhs) noexcept
+	: Texture(std::move(rhs)) {}
+
+void DataTexture2D::bind(int slot)
+{
+	glActiveTexture(GL_TEXTURE0 + slot);
+	glBindTexture(GL_TEXTURE_2D, _handle);
+}
+
+void DataTexture2D::unbind() const
+{
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void DataTexture2D::generateMipmap()
+{
+	glBindTexture(GL_TEXTURE_2D, _handle);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void DataTexture2D::setParamterInt(GLenum name, int value)
+{
+	glBindTexture(GL_TEXTURE_2D, _handle);
+	glTexParameteri(GL_TEXTURE_2D, name, value);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}

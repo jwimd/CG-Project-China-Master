@@ -43,6 +43,30 @@ private:
 	std::string _path;
 };
 
+class DataTexture2D : public Texture
+{
+public:
+	DataTexture2D(GLenum internalFormat, int width, int height, GLenum format, GLenum dataType);
+
+	DataTexture2D(DataTexture2D &&rhs) noexcept;
+
+	~DataTexture2D() = default;
+
+	void bind() const
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, _handle);
+	}
+
+	void bind(int slot);
+
+	void unbind() const override;
+
+	void generateMipmap();
+
+	void setParamterInt(GLenum name, int value);
+};
+
 class TextureCubemap : public Texture {
 public:
 	TextureCubemap(const std::vector<std::string>& filenames);

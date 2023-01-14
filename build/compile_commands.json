@@ -66,6 +66,11 @@
 },
 {
   "directory": "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base",
+  "command": "/usr/bin/g++    -g   -o CMakeFiles/base.dir/fullscreen_quad.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/fullscreen_quad.cpp",
+  "file": "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/fullscreen_quad.cpp"
+},
+{
+  "directory": "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/base",
   "command": "/usr/bin/gcc   -g   -o CMakeFiles/base.dir/glad.c.o   -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/glad.c",
   "file": "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/glad.c"
 },

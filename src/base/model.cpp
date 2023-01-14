@@ -166,8 +166,9 @@ void Model::draw() const {
     glBindVertexArray(0);
 }
 
-GLuint Model::getVao() const {
-    return _vao;
+	GLuint Model::getVao() const
+{
+	return _vao;
 }
 
 size_t Model::getVertexCount() const {

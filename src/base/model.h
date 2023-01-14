@@ -45,8 +45,8 @@ public:
     BoundingBox getBoundingBox() const;
 
     virtual void draw() const;
-
-	glm::mat4 getModelMatrix() const;
+    
+    glm::mat4 getModelMatrix() const;
 
 	void saveAsObjFile(const std::string& filename) const;
 
@@ -64,6 +64,8 @@ protected:
     // bounding box
     BoundingBox _boundingBox;
 	BoundingBox _boundingBoxGlobal;
+
+    const int _windowWidth = 1280, _windowHeight = 720;
 
     // opengl objects
     GLuint _vao = 0;

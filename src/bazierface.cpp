@@ -1,5 +1,13 @@
 #include "bezierface.h"
 #include <cmath>
+#include <limits>
+#include <unordered_map>
+#include <algorithm>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <iomanip>
+
 using namespace std;
 #define step 50
 
