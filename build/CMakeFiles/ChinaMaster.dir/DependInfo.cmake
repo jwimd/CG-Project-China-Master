@@ -7,6 +7,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/bazierface.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles/ChinaMaster.dir/bazierface.cpp.o"
   "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/diymodel.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles/ChinaMaster.dir/diymodel.cpp.o"
   "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/environment.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles/ChinaMaster.dir/environment.cpp.o"
+  "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/flower.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles/ChinaMaster.dir/flower.cpp.o"
   "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.o"
   "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_demo.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles/ChinaMaster.dir/imgui/imgui_demo.cpp.o"
   "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_draw.cpp" "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles/ChinaMaster.dir/imgui/imgui_draw.cpp.o"

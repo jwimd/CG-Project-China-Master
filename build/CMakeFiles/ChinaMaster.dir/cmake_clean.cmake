@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/ChinaMaster.dir/bazierface.cpp.o"
   "CMakeFiles/ChinaMaster.dir/diymodel.cpp.o"
   "CMakeFiles/ChinaMaster.dir/environment.cpp.o"
+  "CMakeFiles/ChinaMaster.dir/flower.cpp.o"
   "CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.o"
   "CMakeFiles/ChinaMaster.dir/imgui/imgui_demo.cpp.o"
   "CMakeFiles/ChinaMaster.dir/imgui/imgui_draw.cpp.o"

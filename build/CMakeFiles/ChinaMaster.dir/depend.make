@@ -39,6 +39,16 @@ CMakeFiles/ChinaMaster.dir/environment.cpp.o: /home/jwimd/Study/Computer_Graphic
 CMakeFiles/ChinaMaster.dir/environment.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/diymodel.h
 CMakeFiles/ChinaMaster.dir/environment.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/environment.cpp
 CMakeFiles/ChinaMaster.dir/environment.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/final_project.h
+CMakeFiles/ChinaMaster.dir/environment.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/flower.h
+
+CMakeFiles/ChinaMaster.dir/flower.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/camera.h
+CMakeFiles/ChinaMaster.dir/flower.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/glsl_program.h
+CMakeFiles/ChinaMaster.dir/flower.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/light.h
+CMakeFiles/ChinaMaster.dir/flower.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/object3d.h
+CMakeFiles/ChinaMaster.dir/flower.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/stb_image.h
+CMakeFiles/ChinaMaster.dir/flower.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/base/texture.h
+CMakeFiles/ChinaMaster.dir/flower.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/flower.cpp
+CMakeFiles/ChinaMaster.dir/flower.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/flower.h
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imconfig.h
 CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui.cpp
@@ -100,5 +110,6 @@ CMakeFiles/ChinaMaster.dir/main.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Pro
 CMakeFiles/ChinaMaster.dir/main.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/bezierface.h
 CMakeFiles/ChinaMaster.dir/main.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/diymodel.h
 CMakeFiles/ChinaMaster.dir/main.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/final_project.h
+CMakeFiles/ChinaMaster.dir/main.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/flower.h
 CMakeFiles/ChinaMaster.dir/main.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/main.cpp
 

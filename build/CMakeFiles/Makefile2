@@ -94,12 +94,12 @@ base/clean: base/CMakeFiles/base.dir/clean
 CMakeFiles/ChinaMaster.dir/all: base/CMakeFiles/base.dir/all
 	$(MAKE) -f CMakeFiles/ChinaMaster.dir/build.make CMakeFiles/ChinaMaster.dir/depend
 	$(MAKE) -f CMakeFiles/ChinaMaster.dir/build.make CMakeFiles/ChinaMaster.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12 "Built target ChinaMaster"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13 "Built target ChinaMaster"
 .PHONY : CMakeFiles/ChinaMaster.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ChinaMaster.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles 24
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles 25
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/ChinaMaster.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles 0
 .PHONY : CMakeFiles/ChinaMaster.dir/rule
@@ -121,7 +121,7 @@ CMakeFiles/ChinaMaster.dir/clean:
 base/CMakeFiles/base.dir/all:
 	$(MAKE) -f base/CMakeFiles/base.dir/build.make base/CMakeFiles/base.dir/depend
 	$(MAKE) -f base/CMakeFiles/base.dir/build.make base/CMakeFiles/base.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=13,14,15,16,17,18,19,20,21,22,23,24 "Built target base"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=14,15,16,17,18,19,20,21,22,23,24,25 "Built target base"
 .PHONY : base/CMakeFiles/base.dir/all
 
 # Build rule for subdir invocation for target.

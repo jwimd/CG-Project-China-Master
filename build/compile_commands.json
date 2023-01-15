@@ -16,6 +16,11 @@
 },
 {
   "directory": "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build",
+  "command": "/usr/bin/g++    -g   -o CMakeFiles/ChinaMaster.dir/flower.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/flower.cpp",
+  "file": "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/flower.cpp"
+},
+{
+  "directory": "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build",
   "command": "/usr/bin/g++    -g   -o CMakeFiles/ChinaMaster.dir/main.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/main.cpp",
   "file": "/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/main.cpp"
 },

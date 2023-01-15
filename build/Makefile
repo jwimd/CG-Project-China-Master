@@ -217,6 +217,33 @@ environment.cpp.s:
 	$(MAKE) -f CMakeFiles/ChinaMaster.dir/build.make CMakeFiles/ChinaMaster.dir/environment.cpp.s
 .PHONY : environment.cpp.s
 
+flower.o: flower.cpp.o
+
+.PHONY : flower.o
+
+# target to build an object file
+flower.cpp.o:
+	$(MAKE) -f CMakeFiles/ChinaMaster.dir/build.make CMakeFiles/ChinaMaster.dir/flower.cpp.o
+.PHONY : flower.cpp.o
+
+flower.i: flower.cpp.i
+
+.PHONY : flower.i
+
+# target to preprocess a source file
+flower.cpp.i:
+	$(MAKE) -f CMakeFiles/ChinaMaster.dir/build.make CMakeFiles/ChinaMaster.dir/flower.cpp.i
+.PHONY : flower.cpp.i
+
+flower.s: flower.cpp.s
+
+.PHONY : flower.s
+
+# target to generate assembly for a file
+flower.cpp.s:
+	$(MAKE) -f CMakeFiles/ChinaMaster.dir/build.make CMakeFiles/ChinaMaster.dir/flower.cpp.s
+.PHONY : flower.cpp.s
+
 imgui/imgui.o: imgui/imgui.cpp.o
 
 .PHONY : imgui/imgui.o
@@ -452,6 +479,9 @@ help:
 	@echo "... environment.o"
 	@echo "... environment.i"
 	@echo "... environment.s"
+	@echo "... flower.o"
+	@echo "... flower.i"
+	@echo "... flower.s"
 	@echo "... imgui/imgui.o"
 	@echo "... imgui/imgui.i"
 	@echo "... imgui/imgui.s"

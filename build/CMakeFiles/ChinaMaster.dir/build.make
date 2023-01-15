@@ -96,9 +96,22 @@ CMakeFiles/ChinaMaster.dir/environment.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ChinaMaster.dir/environment.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/environment.cpp -o CMakeFiles/ChinaMaster.dir/environment.cpp.s
 
+CMakeFiles/ChinaMaster.dir/flower.cpp.o: CMakeFiles/ChinaMaster.dir/flags.make
+CMakeFiles/ChinaMaster.dir/flower.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/flower.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ChinaMaster.dir/flower.cpp.o"
+	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ChinaMaster.dir/flower.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/flower.cpp
+
+CMakeFiles/ChinaMaster.dir/flower.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ChinaMaster.dir/flower.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/flower.cpp > CMakeFiles/ChinaMaster.dir/flower.cpp.i
+
+CMakeFiles/ChinaMaster.dir/flower.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ChinaMaster.dir/flower.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/flower.cpp -o CMakeFiles/ChinaMaster.dir/flower.cpp.s
+
 CMakeFiles/ChinaMaster.dir/main.cpp.o: CMakeFiles/ChinaMaster.dir/flags.make
 CMakeFiles/ChinaMaster.dir/main.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ChinaMaster.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ChinaMaster.dir/main.cpp.o"
 	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ChinaMaster.dir/main.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/main.cpp
 
 CMakeFiles/ChinaMaster.dir/main.cpp.i: cmake_force
@@ -111,7 +124,7 @@ CMakeFiles/ChinaMaster.dir/main.cpp.s: cmake_force
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.o: CMakeFiles/ChinaMaster.dir/flags.make
 CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.o"
 	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui.cpp
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.i: cmake_force
@@ -124,7 +137,7 @@ CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.s: cmake_force
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui_demo.cpp.o: CMakeFiles/ChinaMaster.dir/flags.make
 CMakeFiles/ChinaMaster.dir/imgui/imgui_demo.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_demo.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui_demo.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui_demo.cpp.o"
 	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ChinaMaster.dir/imgui/imgui_demo.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_demo.cpp
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui_demo.cpp.i: cmake_force
@@ -137,7 +150,7 @@ CMakeFiles/ChinaMaster.dir/imgui/imgui_demo.cpp.s: cmake_force
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui_draw.cpp.o: CMakeFiles/ChinaMaster.dir/flags.make
 CMakeFiles/ChinaMaster.dir/imgui/imgui_draw.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_draw.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui_draw.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui_draw.cpp.o"
 	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ChinaMaster.dir/imgui/imgui_draw.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_draw.cpp
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui_draw.cpp.i: cmake_force
@@ -150,7 +163,7 @@ CMakeFiles/ChinaMaster.dir/imgui/imgui_draw.cpp.s: cmake_force
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_glfw.cpp.o: CMakeFiles/ChinaMaster.dir/flags.make
 CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_glfw.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_impl_glfw.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_glfw.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_glfw.cpp.o"
 	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_glfw.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_impl_glfw.cpp
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_glfw.cpp.i: cmake_force
@@ -163,7 +176,7 @@ CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_glfw.cpp.s: cmake_force
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_opengl3.cpp.o: CMakeFiles/ChinaMaster.dir/flags.make
 CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_opengl3.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_impl_opengl3.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_opengl3.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_opengl3.cpp.o"
 	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_opengl3.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_impl_opengl3.cpp
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_opengl3.cpp.i: cmake_force
@@ -176,7 +189,7 @@ CMakeFiles/ChinaMaster.dir/imgui/imgui_impl_opengl3.cpp.s: cmake_force
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui_tables.cpp.o: CMakeFiles/ChinaMaster.dir/flags.make
 CMakeFiles/ChinaMaster.dir/imgui/imgui_tables.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_tables.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui_tables.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui_tables.cpp.o"
 	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ChinaMaster.dir/imgui/imgui_tables.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_tables.cpp
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui_tables.cpp.i: cmake_force
@@ -189,7 +202,7 @@ CMakeFiles/ChinaMaster.dir/imgui/imgui_tables.cpp.s: cmake_force
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui_widgets.cpp.o: CMakeFiles/ChinaMaster.dir/flags.make
 CMakeFiles/ChinaMaster.dir/imgui/imgui_widgets.cpp.o: /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_widgets.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui_widgets.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/ChinaMaster.dir/imgui/imgui_widgets.cpp.o"
 	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ChinaMaster.dir/imgui/imgui_widgets.cpp.o -c /home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/src/imgui/imgui_widgets.cpp
 
 CMakeFiles/ChinaMaster.dir/imgui/imgui_widgets.cpp.i: cmake_force
@@ -205,6 +218,7 @@ ChinaMaster_OBJECTS = \
 "CMakeFiles/ChinaMaster.dir/bazierface.cpp.o" \
 "CMakeFiles/ChinaMaster.dir/diymodel.cpp.o" \
 "CMakeFiles/ChinaMaster.dir/environment.cpp.o" \
+"CMakeFiles/ChinaMaster.dir/flower.cpp.o" \
 "CMakeFiles/ChinaMaster.dir/main.cpp.o" \
 "CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.o" \
 "CMakeFiles/ChinaMaster.dir/imgui/imgui_demo.cpp.o" \
@@ -220,6 +234,7 @@ ChinaMaster_EXTERNAL_OBJECTS =
 ChinaMaster: CMakeFiles/ChinaMaster.dir/bazierface.cpp.o
 ChinaMaster: CMakeFiles/ChinaMaster.dir/diymodel.cpp.o
 ChinaMaster: CMakeFiles/ChinaMaster.dir/environment.cpp.o
+ChinaMaster: CMakeFiles/ChinaMaster.dir/flower.cpp.o
 ChinaMaster: CMakeFiles/ChinaMaster.dir/main.cpp.o
 ChinaMaster: CMakeFiles/ChinaMaster.dir/imgui/imgui.cpp.o
 ChinaMaster: CMakeFiles/ChinaMaster.dir/imgui/imgui_demo.cpp.o
@@ -236,7 +251,7 @@ ChinaMaster: /usr/lib/x86_64-linux-gnu/libGLU.so
 ChinaMaster: /lib/x86_64-linux-gnu/libdl.so
 ChinaMaster: /usr/lib/x86_64-linux-gnu/libglfw.so
 ChinaMaster: CMakeFiles/ChinaMaster.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Linking CXX executable ChinaMaster"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/jwimd/Study/Computer_Graphic/CG-Project-China-Master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX executable ChinaMaster"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ChinaMaster.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
