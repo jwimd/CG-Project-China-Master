@@ -18,6 +18,7 @@
 #include "base/texture.h"
 
 #include "diymodel.h"
+#include "flower.h"
 
 struct Wall
 {
@@ -49,9 +50,8 @@ struct Tex
 	std::unique_ptr<Texture2D> metalPainted;
 	std::unique_ptr<Texture2D> plastic;
 	std::unique_ptr<Texture2D> table;
-	std::unique_ptr<Texture2D> objTex[4];
-	std::unique_ptr<Texture2D> objSideTex[2];
-	std::unique_ptr<Texture2D> objTopTex[2];
+	std::unique_ptr<Texture2D> objTex[6];
+	std::unique_ptr<Texture2D> objSideTex[6];
 };
 
 struct TransparentMaterial
@@ -66,6 +66,12 @@ enum class RenderMode
 {
 	PhongTexture,
 	AlphaBlending
+};
+
+enum class PhongMode
+{
+	TextureEdit,
+	ModelEdit
 };
 
 class FinalProject : public Application
@@ -83,8 +89,12 @@ private:
 	std::vector<Camera *> _cameras;
 
 	enum RenderMode _renderMode = RenderMode::PhongTexture;
+	enum PhongMode _phongMode = PhongMode::ModelEdit;
 
 	int activeCameraIndex = 0;
+
+	int activeBaceTexture = 0;
+	int addTextureIndex = 0;
 
 	int sunOrder = 0;
 	int sunOrderSign = 1;
@@ -105,6 +115,9 @@ private:
 	unsigned int depthMap;
 	unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
+	FlowerSystem flowerSystem;
+	bool flowerShowen = false;
+
 	std::vector<std::unique_ptr<Model>> _postures;
 
 	struct Wall _wall;
@@ -119,6 +132,7 @@ private:
 	std::unique_ptr<SkyBox> gameSkybox;
 
 	GLSLProgram *_phongShader;
+	GLSLProgram *_phongTextureShader;
 	GLSLProgram *_dancerShader;
 	GLSLProgram *_sphereShader;
 	GLSLProgram *_frameShader;
@@ -154,6 +168,7 @@ private:
 	void initDancerShader();
 	void initFrameShader();
 	void initDepthShader();
+	void initTexturePhoneShader();
 
 	void initDepthPeelingShaders();
 	void initDepthPeelingResources();

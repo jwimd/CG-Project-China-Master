@@ -110,38 +110,42 @@ int DIYmodel::load_model(vector<float> *pvalues, vector<float> *tvalues, vector<
     return index;
 }
 
-int DIYmodel::load_circle(vector<float> *pvalues, int tid, bool lor)
-{
-    pvalues->clear();
-    float y, r, pos;
-    if (lor)
-    {
-        pos = textures[tid].l;
-    }
-    else
-        pos = textures[tid].r;
-    for (BezierFace f : faces)
-    {
-        if (f.getRadiance(pos, y, r))
-        {
-            for (float j = 0; j <= 100; j++)
-            {
-                double theta = j / 100 * 2 * 3.14159;
-                pvalues->push_back(r * cos(theta));
-                pvalues->push_back(y);
-                pvalues->push_back(r * sin(theta));
-            }
-            return 303;
-        }
-    }
-}
+// int DIYmodel::load_circle(vector<float> *pvalues, int tid, bool lor)
+// {
+//     pvalues->clear();
+//     float y, r, pos;
+//     if (lor)
+//     {
+//         pos = textures[tid].l;
+//         pos = -1 + 2 * pos;
+//     }
+//     else
+//     {
+//         pos = textures[tid].r;
+//         pos = -1 + 2 * pos;
+//     }
+//     for (BezierFace f : faces)
+//     {
+//         if (f.getRadiance(pos, y, r))
+//         {
+//             for (float j = 0; j <= 100; j++)
+//             {
+//                 double theta = j / 100 * 2 * 3.1415926;
+//                 pvalues->push_back(r * cos(theta));
+//                 pvalues->push_back(y);
+//                 pvalues->push_back(r * sin(theta));
+//             }
+//             return 303;
+//         }
+//     }
+//     return 0;
+// }
 
 // 初始化
 void DIYmodel::init()
 {
     active_point = -1;
     active_tex = 0;
-    material_idx = 0;
     offset = glm::vec3(0, 0, 0);
     for (int i = 0; i < 10; i++)
     {
@@ -292,43 +296,43 @@ void DIYmodel::modify_point(float dx, float dy, Camera *camera)
 }
 
 // 移动整体
-void DIYmodel::modify_offset(float dx, float dy, Camera *camera, int dimension)
-{
-    if (active_point < 0)
-        return;
-    else
-    {
-        float z = camera->position.z - offset.z;
-        float dist = 1000 / z;
+// void DIYmodel::modify_offset(float dx, float dy, Camera *camera, int dimension)
+// {
+//     if (active_point < 0)
+//         return;
+//     else
+//     {
+//         float z = camera->position.z - offset.z;
+//         float dist = 1000 / z;
 
-        if (dimension == 0)
-        {
-            offset.x += dx / (dist);
-        }
-        if (dimension == 1)
-        {
-            if (z < 0)
-            {
-                offset.y += dy / (-dist);
-            }
-            else
-            {
-                offset.y += dy / (dist);
-            }
-        }
-        if (dimension == 2)
-        {
-            if (z < 0)
-            {
-                offset.z -= dy / (dist);
-            }
-            else
-            {
-                offset.z -= dy / (dist);
-            }
-        }
-    }
-}
+//         if (dimension == 0)
+//         {
+//             offset.x += dx / (dist);
+//         }
+//         if (dimension == 1)
+//         {
+//             if (z < 0)
+//             {
+//                 offset.y += dy / (-dist);
+//             }
+//             else
+//             {
+//                 offset.y += dy / (dist);
+//             }
+//         }
+//         if (dimension == 2)
+//         {
+//             if (z < 0)
+//             {
+//                 offset.z -= dy / (dist);
+//             }
+//             else
+//             {
+//                 offset.z -= dy / (dist);
+//             }
+//         }
+//     }
+// }
 // 删除节点
 void DIYmodel::remove_point(int pid)
 {
@@ -385,35 +389,35 @@ void DIYmodel::split_point(int pid)
     }
 }
 
-void DIYmodel::modify_circle(float dx, float dy, Camera* camera, bool lor)
-{
-    if (active_tex < 0)
-        return;
-    else
-    {
-        float z = camera.Position.z;
-        if (z < 0)
-            z = 0 - z;
-        float dist = 10000 / z;
-        if (lor)
-        {
-            textures[active_tex].l += dy / (dist);
-            if (textures[active_tex].l > 1)
-                textures[active_tex].l = 0.999;
-            if (textures[active_tex].l < 0)
-                textures[active_tex].l = 0;
-        }
+// void DIYmodel::modify_circle(float dx, float dy, Camera *camera, bool lor)
+// {
+//     if (active_tex < 0)
+//         return;
+//     else
+//     {
+//         float z = camera->position.z;
+//         if (z < 0)
+//             z = 0 - z;
+//         float dist = 1550 / z;
+//         if (lor)
+//         {
+//             textures[active_tex].l += dy / (dist);
+//             if (textures[active_tex].l > 1)
+//                 textures[active_tex].l = 0.999;
+//             if (textures[active_tex].l < 0)
+//                 textures[active_tex].l = 0;
+//         }
 
-        else
-        {
-            textures[active_tex].r += dy / (dist);
-            if (textures[active_tex].r > 1)
-                textures[active_tex].r = 0.999;
-            if (textures[active_tex].r < 0)
-                textures[active_tex].r = 0;
-        }
-    }
-}
+//         else
+//         {
+//             textures[active_tex].r += dy / (dist);
+//             if (textures[active_tex].r > 1)
+//                 textures[active_tex].r = 0.999;
+//             if (textures[active_tex].r < 0)
+//                 textures[active_tex].r = 0;
+//         }
+//     }
+// }
 
 // 根据鼠标查找线段
 int DIYmodel::get_point(float x, float y, Camera *camera)
@@ -469,55 +473,55 @@ int DIYmodel::get_line_start_point(float x, float y, Camera *camera)
     return -1;
 }
 // 根据鼠标寻找大圆
-int DIYmodel::get_circle(float x, float y, Camera* camera, bool &lor)
-{
-    glm::mat4 projection = glm::perspective(glm::radians(camera->fovy), float(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
-    glm::mat4 view = camera->getViewMatrix();
-    glm::mat4 model;
-    model = glm::translate(model, offset);
-    float zc = camera->position.z;
+// int DIYmodel::get_circle(float x, float y, Camera *camera, bool &lor)
+// {
+//     glm::mat4 projection = glm::perspective(glm::radians(camera->fovy), float(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
+//     glm::mat4 view = camera->getViewMatrix();
+//     glm::mat4 model;
+//     model = glm::translate(model, offset);
+//     float zc = camera->position.z;
 
-    float yl, yr, r;
+//     float yl, yr, r;
 
-    for (int i = 0; i < textures.size(); i++)
-    {
-        for (BezierFace f : faces)
-        {
-            if (f.getRadiance(textures[i].l, yl, r))
-            {
+//     for (int i = 0; i < textures.size(); i++)
+//     {
+//         for (BezierFace f : faces)
+//         {
+//             if (f.getRadiance(textures[i].l, yl, r))
+//             {
 
-                break;
-            }
-        }
-        glm::vec4 pos(r, yl, 0.0, 1.0);
-        pos = wild_screen_baroque(pos, view, projection, model);
-        if (clamp(pos.y, y, 10.0))
-        {
-            lor = true;
-            active_tex = i;
-            return i;
-        }
+//                 break;
+//             }
+//         }
+//         glm::vec4 pos(r, yl, 0.0, 1.0);
+//         pos = wild_screen_baroque(pos, view, projection, model);
+//         if (clamp(pos.y, y, 10.0))
+//         {
+//             lor = true;
+//             active_tex = i;
+//             return i;
+//         }
 
-        for (BezierFace f : faces)
-        {
-            if (f.getRadiance(textures[i].r, yr, r))
-            {
+//         for (BezierFace f : faces)
+//         {
+//             if (f.getRadiance(textures[i].r, yr, r))
+//             {
 
-                break;
-            }
-        }
-        pos = glm::vec4(r, yr, 0.0, 1.0);
-        pos = wild_screen_baroque(pos, view, projection, model);
-        if (clamp(pos.x, x, 10.0) && clamp(pos.y, y, 10.0))
-        {
+//                 break;
+//             }
+//         }
+//         pos = glm::vec4(r, yr, 0.0, 1.0);
+//         pos = wild_screen_baroque(pos, view, projection, model);
+//         if (clamp(pos.x, x, 10.0) && clamp(pos.y, y, 10.0))
+//         {
 
-            lor = false;
-            active_tex = i;
-            return i;
-        }
-    }
-    return -1;
-}
+//             lor = false;
+//             active_tex = i;
+//             return i;
+//         }
+//     }
+//     return -1;
+// }
 
 void DIYmodel::load_from_file(std::string path)
 {
@@ -525,9 +529,9 @@ void DIYmodel::load_from_file(std::string path)
     ifstream is;
     is.open(path);
     glm::vec3 t;
-    // DIYtexture dt;
+    DIYtexture dt;
     vertices.clear();
-    // textures.clear();
+    textures.clear();
     string s;
     int size;
 
@@ -542,13 +546,12 @@ void DIYmodel::load_from_file(std::string path)
         vertices.push_back(t);
     }
 
-    // is>>s;
-    // is>>size;
+    // is >> s;
+    // is >> size;
 
-    // for (int i=0;i<size;i++)
+    // for (int i = 0; i < size; i++)
     // {
-    //     is>>dt.type>>dt.repeat>>dt.reverse>>dt.l>>dt.r>>dt.name;
-    //     load_texture(dt.name,dt);
+    //     is >> dt.type >> dt.repeat >> dt.reverse >> dt.l >> dt.r >> dt.name;
     //     textures.push_back(dt);
     // }
 
@@ -570,12 +573,13 @@ void DIYmodel::save_file(std::string path)
         os << x.x << ' ' << x.y << ' ' << x.z << endl;
     }
 
-    // os<<"texs_begin"<<' '<<textures.size()<<endl;
-    // for(auto x:textures){
-    //     os<<x.type<<' '<<x.repeat<<' '<<x.reverse<<' '<<x.l<<' '<<x.r<<' '<<x.name<<endl;
+    // os << "texs_begin" << ' ' << textures.size() << endl;
+    // for (auto x : textures)
+    // {
+    //     os << x.type << ' ' << x.repeat << ' ' << x.reverse << ' ' << x.l << ' ' << x.r << ' ' << x.name << endl;
     // }
 
-    // os<<"texs_end"<<endl;
+    // os << "texs_end" << endl;
 
     os.close();
 }
@@ -650,25 +654,18 @@ void DIYmodel::drawFrame(GLSLProgram *frameShader)
     fpvalues.clear();
 }
 
-// void DIYmodel::DrawTexFrame(Camera camera, Shader frameShader, bool texframedisplay)
+// void DIYmodel::DrawTexFrame(GLSLProgram *frameShader)
 // {
 //     fpvalues.clear();
 //     if (textures.size() == 0)
 //         return;
 
-//     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
-//     glm::mat4 view = camera.GetViewMatrix();
-//     glm::mat4 model;
-//     model = glm::translate(model, offset);
-
-//     frameShader.use();
-//     frameShader.setMat4("projection", projection);
-//     frameShader.setMat4("view", view);
-//     frameShader.setMat4("model", model);
-
+//     frameShader->use();
 //     for (int i = 0; i < textures.size(); i++)
 //     {
-//         frameShader.setVec3("color", glm::vec3(0.0, 0.5, 0.5));
+
+//         glDisable(GL_DEPTH_TEST);
+//         frameShader->setVec3("color", glm::vec3(0.0, 0.5, 0.5));
 //         findex = load_circle(&fpvalues, i, true);
 
 //         glGenVertexArrays(1, &VAO2);
@@ -681,18 +678,18 @@ void DIYmodel::drawFrame(GLSLProgram *frameShader)
 //         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 //         glEnableVertexAttribArray(0);
 
-//         if (texframedisplay && i == active_tex)
+        
+//         if (i == active_tex)
 //             glDrawArrays(GL_LINE_STRIP, 0, findex);
 
-//         glDisable(GL_DEPTH_TEST);
-//         frameShader.setVec3("color", glm::vec3(1.0, 1.0, 1.0));
-//         if (texframedisplay)
-//             glDrawArrays(GL_POINTS, 0, 1);
+//         frameShader->setVec3("color", glm::vec3(1.0, 1.0, 1.0));
+//         glDrawArrays(GL_POINTS, 0, 1);
 
 //         glEnable(GL_DEPTH_TEST);
 
-//         frameShader.setVec3("color", glm::vec3(0.5, 0.0, 0.5));
+//         frameShader->setVec3("color", glm::vec3(0.5, 0.0, 0.5));
 
+//         glDisable(GL_DEPTH_TEST);
 //         findex = load_circle(&fpvalues, i, false);
 //         glGenVertexArrays(1, &VAO2);
 //         glGenBuffers(1, &VBO2);
@@ -703,19 +700,15 @@ void DIYmodel::drawFrame(GLSLProgram *frameShader)
 //         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 //         glEnableVertexAttribArray(0);
 
-//         if (texframedisplay && i == active_tex)
+        
+//         if (active_tex)
 //             glDrawArrays(GL_LINE_STRIP, 0, findex);
-
-//         glDisable(GL_DEPTH_TEST);
-//         frameShader.setVec3("color", glm::vec3(1.0, 1.0, 1.0));
-//         if (texframedisplay)
-//             glDrawArrays(GL_POINTS, 0, 1);
+        
+//         frameShader->setVec3("color", glm::vec3(1.0, 1.0, 1.0));
+//         glDrawArrays(GL_POINTS, 0, 1);
 
 //         glEnable(GL_DEPTH_TEST);
 //     }
-
-//     model = glm::mat4(1.0);
-//     frameShader.setMat4("model", model);
 // }
 
 // GLuint DIYmodel::load_texture(string s, DIYtexture &diytex)
@@ -756,73 +749,61 @@ void DIYmodel::drawFrame(GLSLProgram *frameShader)
 //         material_idx = 0;
 // }
 
-// void DIYmodel::add_texture()
+void DIYmodel::add_texture(std::string name, GLuint tex)
+{
+    DIYtexture newtx;
+
+    newtx.l = -0.3f;
+    newtx.r = 0.4f;
+    newtx.repeat = 4;
+    newtx.reverse = 0;
+    newtx.type = 0;
+    newtx.name = name;
+
+    newtx.map = tex;
+
+    active_tex = textures.size();
+    textures.push_back(newtx);
+}
+
+// void DIYmodel::add_repeat(bool t)
 // {
-//     DIYtexture newtx;
-
-//     OPENFILENAME ofn;       // 公共对话框结构。
-//     TCHAR szFile[MAX_PATH]; // 保存获取文件名称的缓冲区。
-//     // 初始化选择文件对话框。
-//     ZeroMemory(&ofn, sizeof(OPENFILENAME));
-//     ofn.lStructSize = sizeof(OPENFILENAME);
-//     ofn.hwndOwner = NULL;
-//     ofn.lpstrFile = szFile;
-//     ofn.lpstrFile[0] = '\0';
-//     ofn.nMaxFile = sizeof(szFile);
-//     ofn.lpstrFilter = "All(*.*)\0*.*\0Text(*.txt)\0*.TXT\0\0";
-//     ofn.nFilterIndex = 1;
-//     ofn.lpstrFileTitle = NULL;
-//     ofn.nMaxFileTitle = 0;
-//     ofn.lpstrInitialDir = NULL;
-
-//     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-//     // ofn.lpTemplateName =  MAKEINTRESOURCE(ID_TEMP_DIALOG);
-//     //  显示打开选择文件对话框。
-
-//     if (GetOpenFileName(&ofn))
+//     if (t)
 //     {
-//         load_texture(szFile, newtx);
-
-//         newtx.l = 0.3;
-//         newtx.r = 0.4;
-//         newtx.repeat = 4;
-//         newtx.reverse = 0;
-//         newtx.name = szFile;
-
-//         active_tex = textures.size();
-//         textures.push_back(newtx);
+//         textures[active_tex].repeat++;
+//     }
+//     else
+//     {
+//         textures[active_tex].repeat--;
+//         if (textures[active_tex].repeat < 1)
+//             textures[active_tex].repeat = 1;
 //     }
 // }
 
-void DIYmodel::add_repeat(bool t)
-{
-    if (t)
-    {
-        textures[active_tex].repeat++;
-    }
-    else
-    {
-        textures[active_tex].repeat--;
-        if (textures[active_tex].repeat < 1)
-            textures[active_tex].repeat = 1;
-    }
-}
+// void DIYmodel::trans_tex_type()
+// {
+//     textures[active_tex].type = 1 - textures[active_tex].type;
+// }
+// void DIYmodel::reverse_tex()
+// {
+//     textures[active_tex].reverse = 1 - textures[active_tex].reverse;
+// }
 
-void DIYmodel::trans_tex_type()
-{
-    textures[active_tex].type = 1 - textures[active_tex].type;
-}
-void DIYmodel::reverse_tex()
-{
-    textures[active_tex].reverse = 1 - textures[active_tex].reverse;
-}
+// void DIYmodel::active_texture(int index)
+// {
+//     if (textures.size() <= index)
+//         return;
 
-void DIYmodel::remove_texture()
+//     active_tex = index;
+// }
+
+void DIYmodel::remove_texture(int index)
 {
     if (textures.size() <= 0)
         return;
-    vector<DIYtexture>::iterator i = textures.begin() + active_tex;
-    active_tex -= 1;
+    vector<DIYtexture>::iterator i = textures.begin() + index;
+
+    active_tex = -1;
     textures.erase(i);
 }
 

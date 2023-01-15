@@ -23,6 +23,8 @@ public:
     int reverse; // 反转
     std::string name;
     GLuint map;
+    bool isRev = false, isTop = false;
+    float pos = -0.2f, width = 0.4f;
     DIYtexture(int t, int re, float l0, float r0, GLuint m)
     {
         type = t;
@@ -48,11 +50,9 @@ private:
     glm::vec3 offset;
     vector<glm::vec3> vertices; // 锚点
     int active_point;
-    int active_tex;
-    int material_idx;
-    DIYtexture material;
+
+    // int material_idx;
     vector<BezierFace> faces;
-    vector<DIYtexture> textures;
 
     GLuint VAO, VBO[3];
     GLuint VAO2, VBO2;
@@ -67,20 +67,23 @@ private:
 
     int totalindex, findex;
 
-    GLuint load_texture(string s,DIYtexture &diy);
+    GLuint load_texture(string s, DIYtexture &diy);
     int load_model(vector<float> *pvalues, vector<float> *tvalues, vector<float> *nvalues);
     int load_frame(vector<float> *pvalues);
-    int load_circle(vector<float>* pvalues,int tid,bool lor);
+    // int load_circle(vector<float> *pvalues, int tid, bool lor);
     bool load_active(vector<float> *pvalues);
     void makeFaces();
     void init();
-    int texIndex = 0;
 
     // bounding box
     BoundingBox _boundingBox;
     BoundingBox _boundingBoxGlobal;
 
 public:
+    vector<DIYtexture> textures;
+    int active_tex;
+
+
     glm::vec3 oldright = {0.0f, 0.0f, 0.0f};
     glm::vec3 oldup = {0.0f, 0.0f, 0.0f};
     glm::vec3 oldfront = {0.0f, 0.0f, 0.0f};
@@ -89,17 +92,14 @@ public:
 
     int get_point(float x, float y, Camera *camera);
     int get_line_start_point(float x, float y, Camera *camera);
-    int get_circle(float x, float y, Camera *camera, bool &lor);
-    int get_between_circle(float x, float y, Camera *camera);
+    // int get_circle(float x, float y, Camera *camera, bool &lor);
+    // int get_between_circle(float x, float y, Camera *camera);
     void active(int index);
 
     void split_point(int pid);
     void remove_point(int pid);
     void modify_point(float dx, float dy, Camera *camera);
-    void modify_offset(float dx, float dy, Camera *camera, int d);
-
-    int getTexIndex() { return texIndex; }
-    void setTexIndex(int i) { texIndex = i; }
+    // void modify_offset(float dx, float dy, Camera *camera, int d);
 
     glm::mat4 getModelMatrix();
     void computeRotationQuat();
@@ -109,16 +109,17 @@ public:
     void remake();
     // void switch_material();
 
-    void add_texture();
-    void modify_circle(float dx,float dy,Camera* camera,bool lor);
-    void remove_texture();
-    void add_repeat(bool t);
-    void trans_tex_type();
-    void reverse_tex();
+    // void active_texture(int index);
+    void add_texture(std::string name, GLuint tex);
+    // void modify_circle(float dx,float dy,Camera* camera,bool lor);
+    void remove_texture(int index);
+    // void add_repeat(bool t);
+    // void trans_tex_type();
+    // void reverse_tex();
 
     void draw();
     void drawFrame(GLSLProgram *f);
-    // void DrawTexFrame(Camera c,Shader s,bool d);
+    // void DrawTexFrame(GLSLProgram *frameShader);
 
     void save_file(std::string path);
     void load_from_file(std::string path);

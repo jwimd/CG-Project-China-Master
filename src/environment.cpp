@@ -23,18 +23,20 @@ const std::string plasticTexturePath = "../media/texture/plastic.jpg";
 const std::string tableTexturePath = "../media/resources/wood2.jpg";
 
 const string objTexturePaths[] = {
+	"../media/resources/purple.png",
+	"../media/resources/purple_normal.png",
 	"../media/resources/stone.jpg",
 	"../media/resources/stone2.jpg",
-	"../media/resources/purple.png",
-	"../media/resources/purple_normal.png"};
+	"../media/resources/wood1.jpg",
+	"../media/resources/wood2.jpg"};
 
 const string objSideTexturePaths[] = {
 	"../media/resources/texture/side1.jpg",
-	"../media/resources/texture/side2.jpg"};
-
-const string objTopTexturePaths[] = {
+	"../media/resources/texture/side2.jpg",
 	"../media/resources/texture/top1.jpg",
-	"../media/resources/texture/top2.jpg"};
+	"../media/resources/texture/top2.jpg",
+	"../media/resources/texture/fu.jpg",
+	"../media/resources/texture/fu2.jpg"};
 
 const std::vector<std::string>
 	skyboxTexturePaths = {"../media/starfield/Right_Tex.jpg", "../media/starfield/Left_Tex.jpg", "../media/starfield/Up_Tex.jpg", "../media/starfield/Down_Tex.jpg", "../media/starfield/Front_Tex.jpg", "../media/starfield/Back_Tex.jpg"};
@@ -138,12 +140,18 @@ FinalProject::FinalProject(const Options &options) : Application(options)
 	_texture.plastic.reset(new Texture2D(plasticTexturePath));
 	_texture.table.reset(new Texture2D(tableTexturePath));
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 6; i++)
 		_texture.objTex[i].reset(new Texture2D(objTexturePaths[i]));
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 6; i++)
 		_texture.objSideTex[i].reset(new Texture2D(objSideTexturePaths[i]));
+
 	for (int i = 0; i < 2; i++)
-		_texture.objTopTex[i].reset(new Texture2D(objTopTexturePaths[i]));
+		flowerSystem.texture[i].reset(new Texture2D(flowerSystem.flowerpath[i]));
+
+	glActiveTexture(GL_TEXTURE20);
+	flowerSystem.texture[0]->bind();
+	glActiveTexture(GL_TEXTURE21);
+	flowerSystem.texture[1]->bind();
 
 	// init shader
 	initPhongShader();
@@ -151,6 +159,7 @@ FinalProject::FinalProject(const Options &options) : Application(options)
 	initDancerShader();
 	initFrameShader();
 	initDepthShader();
+	initTexturePhoneShader();
 
 	initDepthPeelingShaders();
 	initDepthPeelingResources();
@@ -309,35 +318,64 @@ void FinalProject::handleInput()
 			showCursor = true;
 			glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		}
+
+		sunOrder += 1 * sunOrderSign;
+		_spotLightSphere->position = glm::vec3(0.005f * sunOrder, 10.0f, 7.0f);
+		if (sunOrder == 2000)
+			sunOrderSign = -1;
+		if (sunOrder == -2000)
+			sunOrderSign = 1;
 	}
 	else
 	{
 		int point, circle;
 		bool lor;
+		bool lorSelection;
 		if (_mouseInput.click.left)
 		{
-			point = _geometry.gameObject->get_point(_mouseInput.move.xOld, _mouseInput.move.yOld, _cameras[activeCameraIndex]);
-			if (point >= 0)
-				PointSelect = true;
+			if (_phongMode == PhongMode::ModelEdit)
+			{
+				point = _geometry.gameObject->get_point(_mouseInput.move.xOld, _mouseInput.move.yOld, _cameras[activeCameraIndex]);
+				if (point >= 0)
+					PointSelect = true;
+				else
+					PointSelect = false;
+			}
 			else
-				PointSelect = false;
+			{
+				if (circle >= 0)
+				{
+					PointSelect = true;
+					lorSelection = lor;
+				}
+				else
+				{
+					PointSelect = false;
+				}
+			}
 		}
 		else if (_mouseInput.click.middle)
 		{
-			point = _geometry.gameObject->get_line_start_point(_mouseInput.move.xOld, _mouseInput.move.yOld, _cameras[activeCameraIndex]);
-			if (point >= 0)
+			if (_phongMode == PhongMode::ModelEdit)
 			{
-				_geometry.gameObject->split_point(point);
-				notChange = false;
+				point = _geometry.gameObject->get_line_start_point(_mouseInput.move.xOld, _mouseInput.move.yOld, _cameras[activeCameraIndex]);
+				if (point >= 0)
+				{
+					_geometry.gameObject->split_point(point);
+					notChange = false;
+				}
 			}
 		}
 		else if (_mouseInput.click.right)
 		{
-			point = _geometry.gameObject->get_point(_mouseInput.move.xOld, _mouseInput.move.yOld, _cameras[activeCameraIndex]);
-			if (point >= 0)
+			if (_phongMode == PhongMode::ModelEdit)
 			{
-				_geometry.gameObject->remove_point(point);
-				notChange = false;
+				point = _geometry.gameObject->get_point(_mouseInput.move.xOld, _mouseInput.move.yOld, _cameras[activeCameraIndex]);
+				if (point >= 0)
+				{
+					_geometry.gameObject->remove_point(point);
+					notChange = false;
+				}
 			}
 		}
 		else
@@ -352,11 +390,11 @@ void FinalProject::handleInput()
 
 		if (PointSelect)
 		{
-			_geometry.gameObject->modify_point(xoffset, yoffset, _cameras[activeCameraIndex]);
+			if (_phongMode == PhongMode::ModelEdit)
+				_geometry.gameObject->modify_point(xoffset, yoffset, _cameras[activeCameraIndex]);
 			notChange = false;
+			_geometry.gameObject->remake();
 		}
-
-		_geometry.gameObject->remake();
 
 		if (_keyboardInput.keyStates[GLFW_KEY_SPACE] == GLFW_PRESS)
 		{
@@ -438,14 +476,9 @@ void FinalProject::handleInput()
 			camera->znear = 0.1;
 			camera->zfar = 10000.0;
 		}
-	}
 
-	sunOrder += 1 * sunOrderSign;
-	_spotLightSphere->position = glm::vec3(0.005f * sunOrder, 10.0f, 10.0f);
-	if (sunOrder == 2000)
-		sunOrderSign = -1;
-	if (sunOrder == -2000)
-		sunOrderSign = 1;
+		_spotLightSphere->position = glm::vec3(5.5f, 10.0f, 7.0f);
+	}
 }
 
 void FinalProject::renderFrame()
@@ -457,6 +490,7 @@ void FinalProject::renderFrame()
 	_geometry.prismaticTable4->computeRotationQuat();
 	_geometry.prismaticTable6->computeRotationQuat();
 	_geometry.gameObject->computeRotationQuat();
+	_geometry.knot->computeRotationQuat();
 
 	// some options related to imGUI
 	static bool wireframe = false;
@@ -491,29 +525,29 @@ void FinalProject::renderFrame()
 	_sphereShader->setMat4("view", view);
 	_sphereShader->setMat4("model", _spotLightSphere->getModelMatrix());
 
-	_phongShader->use();
+	_phongTextureShader->use();
 	glActiveTexture(GL_TEXTURE10);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
-	_phongShader->setInt("shadowMap", 10);
+	_phongTextureShader->setInt("shadowMap", 10);
 
-	_phongShader->setVec3("directionalLight.direction", _directionalLight->direction);
-	_phongShader->setFloat("directionalLight.intensity", _directionalLight->intensity);
-	_phongShader->setVec3("directionalLight.color", _directionalLight->color);
-	_phongShader->setMat4("projection", projection);
-	_phongShader->setMat4("view", view);
-	_phongShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+	_phongTextureShader->setVec3("directionalLight.direction", _directionalLight->direction);
+	_phongTextureShader->setFloat("directionalLight.intensity", _directionalLight->intensity);
+	_phongTextureShader->setVec3("directionalLight.color", _directionalLight->color);
+	_phongTextureShader->setMat4("projection", projection);
+	_phongTextureShader->setMat4("view", view);
+	_phongTextureShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 	_spotLight->position = _spotLightSphere->position;
-	_phongShader->setVec3("spotLight.position", _spotLight->position);
-	_phongShader->setVec3("spotLight.direction", _spotLight->direction);
-	_phongShader->setFloat("spotLight.intensity", _spotLight->intensity);
-	_phongShader->setVec3("spotLight.color", _spotLight->color);
-	_phongShader->setFloat("spotLight.angle", _spotLight->angle);
-	_phongShader->setFloat("spotLight.kc", _spotLight->kc);
-	_phongShader->setFloat("spotLight.kl", _spotLight->kl);
-	_phongShader->setFloat("spotLight.kq", _spotLight->kq);
+	_phongTextureShader->setVec3("spotLight.position", _spotLight->position);
+	_phongTextureShader->setVec3("spotLight.direction", _spotLight->direction);
+	_phongTextureShader->setFloat("spotLight.intensity", _spotLight->intensity);
+	_phongTextureShader->setVec3("spotLight.color", _spotLight->color);
+	_phongTextureShader->setFloat("spotLight.angle", _spotLight->angle);
+	_phongTextureShader->setFloat("spotLight.kc", _spotLight->kc);
+	_phongTextureShader->setFloat("spotLight.kl", _spotLight->kl);
+	_phongTextureShader->setFloat("spotLight.kq", _spotLight->kq);
 
-	_phongShader->setVec3("viewPosition", _cameras[activeCameraIndex]->position);
+	_phongTextureShader->setVec3("viewPosition", _cameras[activeCameraIndex]->position);
 
 	glActiveTexture(GL_TEXTURE1);
 	_texture.wood->bind();
@@ -530,7 +564,12 @@ void FinalProject::renderFrame()
 	glActiveTexture(GL_TEXTURE7);
 	_texture.plastic->bind();
 	glActiveTexture(GL_TEXTURE8);
-	_texture.objTex[_geometry.gameObject->getTexIndex()]->bind();
+	_texture.objTex[activeBaceTexture]->bind();
+	for (int i = 0; i < 6; i++)
+	{
+		glActiveTexture(GL_TEXTURE11 + i);
+		_texture.objSideTex[i]->bind();
+	}
 
 	if (!gameMode)
 	{
@@ -559,6 +598,7 @@ void FinalProject::renderFrame()
 			break;
 		case 8:
 			setPanCamera(_postures[postureFrameNumber / 5].get());
+			break;
 		case 9:
 			setPanCamera(_geometry.knot);
 		default:
@@ -659,6 +699,30 @@ void FinalProject::renderFrame()
 			playOrder = 1;
 
 		_phongShader->use();
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+		_phongShader->setInt("shadowMap", 10);
+
+		_phongShader->setVec3("directionalLight.direction", _directionalLight->direction);
+		_phongShader->setFloat("directionalLight.intensity", _directionalLight->intensity);
+		_phongShader->setVec3("directionalLight.color", _directionalLight->color);
+		_phongShader->setMat4("projection", projection);
+		_phongShader->setMat4("view", view);
+		_phongShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		_spotLight->position = _spotLightSphere->position;
+		_phongShader->setVec3("spotLight.position", _spotLight->position);
+		_phongShader->setVec3("spotLight.direction", _spotLight->direction);
+		_phongShader->setFloat("spotLight.intensity", _spotLight->intensity);
+		_phongShader->setVec3("spotLight.color", _spotLight->color);
+		_phongShader->setFloat("spotLight.angle", _spotLight->angle);
+		_phongShader->setFloat("spotLight.kc", _spotLight->kc);
+		_phongShader->setFloat("spotLight.kl", _spotLight->kl);
+		_phongShader->setFloat("spotLight.kq", _spotLight->kq);
+
+		_phongShader->setVec3("viewPosition", _cameras[activeCameraIndex]->position);
+
+		_phongShader->use();
 
 		_phongShader->setInt("mapKd", 1);
 		_wall.floor->setPhongShader(_phongShader);
@@ -699,8 +763,24 @@ void FinalProject::renderFrame()
 
 		if (_renderMode == RenderMode::PhongTexture)
 		{
-			_phongShader->setInt("mapKd", 8);
-			_geometry.gameObject->setPhongShader(_phongShader);
+			_phongTextureShader->use();
+
+			_phongTextureShader->setInt("mapKd", 8);
+			int texnum = _geometry.gameObject->textures.size();
+
+			_phongTextureShader->setMat4("model", _geometry.gameObject->getModelMatrix());
+
+			_phongTextureShader->setInt("texnum", texnum);
+			for (int i = 0; i < texnum; i++)
+			{
+				_phongTextureShader->setFloat("trange_l[" + to_string(i) + "]", _geometry.gameObject->textures[i].l);
+				_phongTextureShader->setFloat("trange_r[" + to_string(i) + "]", _geometry.gameObject->textures[i].r);
+				_phongTextureShader->setInt("texs[" + to_string(i) + "]", _geometry.gameObject->textures[i].map);
+				_phongTextureShader->setInt("repeat[" + to_string(i) + "]", _geometry.gameObject->textures[i].repeat);
+				_phongTextureShader->setInt("reverse[" + to_string(i) + "]", _geometry.gameObject->textures[i].reverse);
+				_phongTextureShader->setInt("type[" + to_string(i) + "]", _geometry.gameObject->textures[i].type);
+			}
+			_geometry.gameObject->setPhongShader(_phongTextureShader);
 			_geometry.gameObject->draw();
 		}
 
@@ -738,15 +818,47 @@ void FinalProject::renderFrame()
 		glViewport(0, 0, _windowWidth, _windowHeight);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		if (flowerShowen)
+		{
+			static int i = 0;
+			i = (i + 1) % 5;
+			if (i == 0)
+				flowerSystem.update(_deltaTime);
+			flowerSystem.draw(_cameras[activeCameraIndex]);
+		}
+
 		_sphereShader->use();
 		_spotLightSphere->draw();
-
-		_phongShader->use();
 
 		glActiveTexture(GL_TEXTURE1);
 		_texture.table->bind();
 		glActiveTexture(GL_TEXTURE2);
-		_texture.objTex[_geometry.gameObject->getTexIndex()]->bind();
+		_texture.objTex[activeBaceTexture]->bind();
+
+		_phongShader->use();
+
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+		_phongShader->setInt("shadowMap", 10);
+
+		_phongShader->setVec3("directionalLight.direction", _directionalLight->direction);
+		_phongShader->setFloat("directionalLight.intensity", _directionalLight->intensity);
+		_phongShader->setVec3("directionalLight.color", _directionalLight->color);
+		_phongShader->setMat4("projection", projection);
+		_phongShader->setMat4("view", view);
+		_phongShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		_spotLight->position = _spotLightSphere->position;
+		_phongShader->setVec3("spotLight.position", _spotLight->position);
+		_phongShader->setVec3("spotLight.direction", _spotLight->direction);
+		_phongShader->setFloat("spotLight.intensity", _spotLight->intensity);
+		_phongShader->setVec3("spotLight.color", _spotLight->color);
+		_phongShader->setFloat("spotLight.angle", _spotLight->angle);
+		_phongShader->setFloat("spotLight.kc", _spotLight->kc);
+		_phongShader->setFloat("spotLight.kl", _spotLight->kl);
+		_phongShader->setFloat("spotLight.kq", _spotLight->kq);
+
+		_phongShader->setVec3("viewPosition", _cameras[activeCameraIndex]->position);
 
 		_phongShader->setInt("mapKd", 1);
 		_wall.floor->setPhongShader(_phongShader);
@@ -754,8 +866,22 @@ void FinalProject::renderFrame()
 
 		if (_renderMode == RenderMode::PhongTexture)
 		{
-			_phongShader->setInt("mapKd", 2);
-			_geometry.gameObject->setPhongShader(_phongShader);
+			_phongTextureShader->use();
+
+			int texnum = _geometry.gameObject->textures.size();
+
+			_phongTextureShader->setInt("texnum", texnum);
+			for (int i = 0; i < texnum; i++)
+			{
+				_phongTextureShader->setFloat("trange_l[" + to_string(i) + "]", _geometry.gameObject->textures[i].l);
+				_phongTextureShader->setFloat("trange_r[" + to_string(i) + "]", _geometry.gameObject->textures[i].r);
+				_phongTextureShader->setInt("texs[" + to_string(i) + "]", _geometry.gameObject->textures[i].map);
+				_phongTextureShader->setInt("repeat[" + to_string(i) + "]", _geometry.gameObject->textures[i].repeat);
+				_phongTextureShader->setInt("reverse[" + to_string(i) + "]", _geometry.gameObject->textures[i].reverse);
+				_phongTextureShader->setInt("type[" + to_string(i) + "]", _geometry.gameObject->textures[i].type);
+			}
+			_geometry.gameObject->setPhongShader(_phongTextureShader);
+
 			_geometry.gameObject->draw();
 		}
 
@@ -768,7 +894,8 @@ void FinalProject::renderFrame()
 		_frameShader->setMat4("projection", projection);
 		_frameShader->setMat4("view", view);
 		_frameShader->setMat4("model", _geometry.gameObject->getModelMatrix());
-		_geometry.gameObject->drawFrame(_frameShader);
+		if (_phongMode == PhongMode::ModelEdit)
+			_geometry.gameObject->drawFrame(_frameShader);
 	}
 
 	// draw ui elements
@@ -982,10 +1109,77 @@ void FinalProject::renderFrame()
 		ImGui::RadioButton("Alpha Blending", (int *)&_renderMode, (int)(RenderMode::AlphaBlending));
 		if (_renderMode == RenderMode::PhongTexture)
 		{
+			ImGui::RadioButton("Model Edit", (int *)&_phongMode, (int)(PhongMode::ModelEdit));
+			ImGui::RadioButton("Texture Edit", (int *)&_phongMode, (int)(PhongMode::TextureEdit));
+
 			ImGui::ColorEdit3("ka##7", (float *)&_geometry.gameObject->_phongMaterial->ka);
 			ImGui::ColorEdit3("kd##7", (float *)&_geometry.gameObject->_phongMaterial->kd);
 			ImGui::ColorEdit3("ks##7", (float *)&_geometry.gameObject->_phongMaterial->ks);
 			ImGui::SliderFloat("ns##7", (float *)&_geometry.gameObject->_phongMaterial->ns, 1.0f, 20.0f);
+
+			if (_phongMode == PhongMode::TextureEdit)
+			{
+
+				if (ImGui::TreeNode("base matrial"))
+				{
+					ImGui::RadioButton("purple1", &activeBaceTexture, 0);
+					ImGui::RadioButton("purple2", &activeBaceTexture, 1);
+					ImGui::RadioButton("stone1", &activeBaceTexture, 2);
+					ImGui::RadioButton("stone2", &activeBaceTexture, 3);
+					ImGui::RadioButton("wood1", &activeBaceTexture, 4);
+					ImGui::RadioButton("wood2", &activeBaceTexture, 5);
+					ImGui::TreePop();
+					ImGui::Separator();
+				}
+				if (ImGui::TreeNode("add texture"))
+				{
+					ImGui::RadioButton("side1", &addTextureIndex, 0);
+					ImGui::RadioButton("side2", &addTextureIndex, 1);
+					ImGui::RadioButton("top1", &addTextureIndex, 2);
+					ImGui::RadioButton("top2", &addTextureIndex, 3);
+					ImGui::RadioButton("fu1", &addTextureIndex, 4);
+					ImGui::RadioButton("fu2", &addTextureIndex, 5);
+					if (_geometry.gameObject->textures.size() < 10)
+						if (ImGui::Button("add") == true)
+							_geometry.gameObject->add_texture("texture " + to_string(_geometry.gameObject->textures.size()), 11 + addTextureIndex);
+					ImGui::TreePop();
+					ImGui::Separator();
+				}
+
+				for (int i = 0; i < _geometry.gameObject->textures.size(); i++)
+				{
+
+					if (ImGui::TreeNode(_geometry.gameObject->textures[i].name.c_str()))
+					{
+						// if (ImGui::Button(("active##" + to_string(i)).c_str()) == true)
+						// 	_geometry.gameObject->active_texture(i);
+						ImGui::SliderInt(("repeat##" + to_string(i)).c_str(), (int *)&_geometry.gameObject->textures[i].repeat, 1, 15);
+						ImGui::Checkbox(("is top##" + to_string(i)).c_str(), &_geometry.gameObject->textures[i].isTop);
+						ImGui::Checkbox(("is reverse##" + to_string(i)).c_str(), &_geometry.gameObject->textures[i].isRev);
+
+						if (_geometry.gameObject->textures[i].isTop)
+							_geometry.gameObject->textures[i].type = 1;
+						else
+							_geometry.gameObject->textures[i].type = 0;
+
+						if (_geometry.gameObject->textures[i].isRev)
+							_geometry.gameObject->textures[i].reverse = 1;
+						else
+							_geometry.gameObject->textures[i].reverse = 0;
+
+						ImGui::SliderFloat(("position##" + to_string(i)).c_str(), (float *)&_geometry.gameObject->textures[i].pos, -1.0f, 1.0f);
+						ImGui::SliderFloat(("width##" + to_string(i)).c_str(), (float *)&_geometry.gameObject->textures[i].width, 0.0f, 2.0f);
+
+						_geometry.gameObject->textures[i].l = std::max(-1.0f, _geometry.gameObject->textures[i].pos - _geometry.gameObject->textures[i].width / 2);
+						_geometry.gameObject->textures[i].r = std::min(1.0f, _geometry.gameObject->textures[i].pos + _geometry.gameObject->textures[i].width / 2);
+
+						if (ImGui::Button(("remove##" + to_string(i)).c_str()) == true)
+							_geometry.gameObject->remove_texture(i);
+						ImGui::TreePop();
+						ImGui::Separator();
+					}
+				}
+			}
 		}
 		else
 		{
@@ -995,6 +1189,10 @@ void FinalProject::renderFrame()
 			ImGui::SliderFloat("transparent##9", &_diyMaterial->transparent, 0.0f, 1.0f);
 		}
 		ImGui::Checkbox("open collision detection", &opencd);
+		ImGui::Checkbox("open particle system", &flowerShowen);
+		ImGui::RadioButton("flower", &flowerSystem.type, 0);
+		ImGui::RadioButton("maple", &flowerSystem.type, 1);
+
 		if (ImGui::Button("save to file") == true)
 			_geometry.gameObject->save_file("../output/DIYmodel.txt");
 		if (ImGui::Button("load from file") == true)
@@ -1002,8 +1200,13 @@ void FinalProject::renderFrame()
 			_geometry.gameObject->load_from_file("../output/DIYmodel.txt");
 			_geometry.gameObject->remake();
 		}
-		if (ImGui::Button("reset camera##2") == true)
+		if (ImGui::Button("front view##2") == true)
 			setPanCamera(_geometry.gameObject);
+		if (ImGui::Button("top view##2") == true)
+		{
+			_cameras[activeCameraIndex]->position = glm::vec3{0.0f, 7.0f, 5.0f};
+			_cameras[activeCameraIndex]->rotation = glm::angleAxis(glm::radians(-50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		}
 		if (ImGui::Button("screenshot##1") == true)
 			screenShot();
 		if (ImGui::Button("finish edit##3") == true)
@@ -1196,6 +1399,220 @@ void FinalProject::initPhongShader()
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void FinalProject::initTexturePhoneShader()
+{
+	const char *vsCode =
+		"#version 330 core\n"
+		"layout(location = 0) in vec3 aPosition;\n"
+		"layout(location = 1) in vec3 aNormal;\n"
+		"layout(location = 2) in vec2 aTexCoord;\n"
+
+		"out vec3 fPosition;\n"
+		"out vec3 fNormal;\n"
+		"out vec2 fTexCoord;\n"
+		"out vec3 fFragPos;\n"
+		"out vec4 fFragPosLightSpace;\n"
+
+		"uniform mat4 model;\n"
+		"uniform mat4 view;\n"
+		"uniform mat4 projection;\n"
+		"uniform mat4 lightSpaceMatrix;\n"
+
+		"void main() {\n"
+		"	fPosition = vec3(model * vec4(aPosition, 1.0f));\n"
+		"	fNormal = mat3(transpose(inverse(model))) * aNormal;\n"
+		"	fTexCoord = aTexCoord;\n"
+		"	gl_Position = projection * view * model * vec4(aPosition, 1.0f);\n"
+		"	fFragPos = vec3(model * vec4(aPosition, 1.0));\n"
+		"	fFragPosLightSpace = lightSpaceMatrix * vec4(fFragPos, 1.0);\n"
+		"}\n";
+
+	const char *fsCode =
+		"#version 330 core\n"
+		"in vec3 fPosition;\n"
+		"in vec3 fNormal;\n"
+		"in vec2 fTexCoord;\n"
+		"in vec3 fFragPos;\n"
+		"in vec4 fFragPosLightSpace;\n"
+		"out vec4 color;\n"
+
+		"struct Material {\n"
+		"	vec3 ka;\n"
+		"	vec3 kd;\n"
+		"	vec3 ks;\n"
+		"	float ns;\n"
+		"};\n"
+
+		"struct DirectionalLight {\n"
+		"	vec3 direction;\n"
+		"	float intensity;\n"
+		"	vec3 color;\n"
+		"};\n"
+
+		"struct SpotLight {\n"
+		"	vec3 position;\n"
+		"	vec3 direction;\n"
+		"	float intensity;\n"
+		"	vec3 color;\n"
+		"	float angle;\n"
+		"	float kc;\n"
+		"	float kl;\n"
+		"	float kq;\n"
+		"};\n"
+
+		"uniform Material material;\n"
+		"uniform DirectionalLight directionalLight;\n"
+		"uniform SpotLight spotLight;\n"
+		"uniform vec3 viewPosition;\n"
+		"uniform sampler2D mapKd;\n"
+		"uniform sampler2D shadowMap;\n"
+		"uniform sampler2D texs[10];\n"
+
+		"uniform int texnum;\n"
+		"uniform float trange_l[10];\n"
+		"uniform  int repeat[10];\n"
+		"uniform  int reverse[10];\n"
+		"uniform float trange_r[10];\n"
+		"uniform int type[10];\n"
+
+		"float ShadowCalculation(vec4 fragPosLightSpace, float bias)\n"
+		"{"
+		"	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;\n"
+		"	projCoords = projCoords * 0.5 + 0.5;\n"
+		"	float closestDepth = texture(shadowMap, projCoords.xy).r;\n"
+		"	float currentDepth = projCoords.z;\n"
+
+		"	float shadow = 0.0;\n"
+		"	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);\n"
+		"	for (int x = -1; x <= 1; ++x)\n"
+		"	{\n"
+		"		for (int y = -1; y <= 1; ++y)\n"
+		"		{\n"
+		"			float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;\n"
+		"			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;\n"
+		"		}\n"
+		"	}\n"
+		"	shadow /= 9.0;\n"
+
+		"	if (projCoords.z > 1.0)\n"
+		"		shadow = 0.0;\n"
+
+		"	return shadow;\n"
+		"}\n"
+
+		"vec3 calTexture()\n"
+		"{\n"
+		"vec3 texcolor=vec3(texture(mapKd, fTexCoord));"
+		"if(texnum>=1)\n"
+		"	for(int i=0;i<texnum;i++){\n"
+		"		vec2 TexCoordV=fTexCoord;\n"
+		"		float len=trange_r[i]-trange_l[i];\n"
+		"		if(TexCoordV.y>trange_l[i]&&TexCoordV.y<trange_r[i]){\n"
+		"			TexCoordV.y= (TexCoordV.y-trange_l[i])/len;\n"
+		"			if(type[i]==0){\n"
+		"				TexCoordV.x=(repeat[i]*TexCoordV.x);\n"
+		" 				if(reverse[i]==1){\n"
+		"					TexCoordV.y=1-TexCoordV.y;\n"
+		"					TexCoordV.x=1-TexCoordV.x;\n"
+		"			}\n"
+		"		}\n"
+		"		else{\n"
+		"			float theta= TexCoordV.x*(2*3.1415926);\n"
+		"			float r=(TexCoordV.y)/2;\n"
+		"			if(reverse[i]==1){\n"
+		"				TexCoordV.x=r*cos(theta)+0.5;\n"
+		"				TexCoordV.y=1-r*sin(theta)+0.5;\n"
+		"			}\n"
+		"			else{\n"
+		"				r=(1-TexCoordV.y)/2;\n"
+		"				TexCoordV.x=r*cos(theta)+0.5;\n"
+		"				TexCoordV.y=r*sin(theta)+0.5;\n"
+		"			}\n"
+		"		}\n"
+		"		if(i==0)"
+		"		texcolor*=vec3(texture(texs[0], TexCoordV));\n"
+		"		if(i==1)"
+		"		texcolor*=vec3(texture(texs[1], TexCoordV));\n"
+		"		if(i==2)"
+		"		texcolor*=vec3(texture(texs[2], TexCoordV));\n"
+		"		if(i==3)"
+		"		texcolor*=vec3(texture(texs[3], TexCoordV));\n"
+		"		if(i==4)"
+		"		texcolor*=vec3(texture(texs[4], TexCoordV));\n"
+		"		if(i==5)"
+		"		texcolor*=vec3(texture(texs[5], TexCoordV));\n"
+		"		if(i==6)"
+		"		texcolor*=vec3(texture(texs[6], TexCoordV));\n"
+		"		if(i==7)"
+		"		texcolor*=vec3(texture(texs[7], TexCoordV));\n"
+		"		if(i==8)"
+		"		texcolor*=vec3(texture(texs[8], TexCoordV));\n"
+		"		if(i==9)"
+		"		texcolor*=vec3(texture(texs[9], TexCoordV));\n"
+		"	}\n"
+		"}\n"
+		"	return texcolor;\n"
+		"}\n"
+
+		"vec3 calcDirectionalLight(vec3 normal, vec3 viewDir, vec3 texcolor) {\n"
+		"	vec3 ambient = directionalLight.intensity * directionalLight.color * material.ka;\n"
+
+		"	vec3 lightDir = normalize(-directionalLight.direction);\n"
+		"	float diff = max(dot(lightDir, normal), 0.0f);\n"
+		"	vec3 diffuse = directionalLight.intensity * directionalLight.color * diff * material.kd;\n"
+
+		"	vec3 reflectDir = reflect(-lightDir, normal);\n"
+		"	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.ns);\n"
+		"	vec3 specular = directionalLight.intensity * directionalLight.color * spec * material.ks;\n"
+		"	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  \n"
+		"	float shadow = 0;\n"
+		"	shadow = ShadowCalculation(fFragPosLightSpace,bias); "
+		"	return (ambient + (1.0 - shadow) * (diffuse + specular)) * texcolor.rgb;\n"
+		"}\n"
+
+		"vec3 calcSpotLight(vec3 normal, vec3 viewDir, vec3 texcolor) {\n"
+		"	vec3 lightDir = normalize(spotLight.position - fPosition);\n"
+		"	float theta = acos(-dot(lightDir, normalize(spotLight.direction)));\n"
+		"	float distance = length(spotLight.position - fPosition);\n"
+		"	float attenuation = 1.0f / (spotLight.kc + spotLight.kl * distance + spotLight.kq * distance * distance);\n"
+
+		"	if (theta <= spotLight.angle) {\n"
+		"		vec3 ambient = spotLight.color *  material.ka * spotLight.intensity * attenuation;\n"
+
+		"		float diff = max(dot(lightDir, normal), 0.0f);\n"
+		"		vec3 diffuse = spotLight.color * diff * material.kd * spotLight.intensity * attenuation;\n"
+
+		"		vec3 reflectDir = reflect(-lightDir, normal);\n"
+		"		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.ns);\n"
+		"		vec3 specular = spotLight.color * spec * material.ks * spotLight.intensity * attenuation;\n"
+		"		float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  "
+		"		float shadow = 0;"
+		"		shadow = ShadowCalculation(fFragPosLightSpace,bias); "
+		"		return (ambient + (1.0 - shadow) * (diffuse + specular)) * texcolor.rgb;\n"
+		"	}\n"
+		"	else {\n"
+		"		vec3 ambient = spotLight.color *  material.ka * spotLight.intensity * attenuation;\n"
+		"		float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  "
+		"		float shadow = 0;"
+		"		shadow = ShadowCalculation(fFragPosLightSpace,bias); "
+		"		return ambient * texcolor.rgb;\n"
+		"	}\n"
+		"}\n"
+
+		"void main() {\n"
+		"	vec3 texcolor = calTexture();"
+		"	vec3 Normal = normalize(fNormal);\n"
+		"	vec3 viewDir = normalize(viewPosition - fPosition);\n"
+		"	vec3 result = calcDirectionalLight(Normal, viewDir, texcolor) + calcSpotLight(Normal, viewDir, texcolor);\n"
+		"	color = vec4(result, 1.0f);\n"
+		"}\n";
+
+	_phongTextureShader = new GLSLProgram;
+	_phongTextureShader->attachVertexShader(vsCode);
+	_phongTextureShader->attachFragmentShader(fsCode);
+	_phongTextureShader->link();
 }
 
 void FinalProject::initSphereShader()
