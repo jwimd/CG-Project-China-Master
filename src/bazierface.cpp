@@ -11,23 +11,45 @@
 using namespace std;
 #define step 50
 
-bool BezierFace::getRadiance(float pos, float &y, float &r)
+void BezierFace::normalCal(float &nx, float &ny, float &nz, float y, float y1, float r, float r1)
 {
-	if (pos < texrange_l || pos >= texrange_r)
-		return false;
-	for (int i = 0; i < us.size(); i++)
+	if (y1 - y < 0.0001 && y - y1 < 0.0001)
 	{
-		if (pos - us[i] < 0.01)
-		{
-			y = ys[i];
-			r = rs[i];
-			return true;
-		}
+		nx = 0;
+		nz = 0;
+		ny = -1;
 	}
-	return false;
+	else
+		ny = -(1.0) * (r1 - r) / (y1 - y);
+
+	if (y1 - y < 0 && r1 - r < 0)
+	{
+		nx = -nx;
+		nz = -nz;
+		ny = -ny;
+	}
 }
 
-void BezierFace::generate(int prec)
+void BezierFace::indicesCal(int prec)
+{
+	// 计算索引
+	for (int i = 0; i < prec; i++)
+	{
+		for (int j = 0; j < prec; j++)
+		{
+			int k = 6 * (i * prec + j);
+			indices[k + 0] = i * (prec + 1) + j;
+			indices[k + 1] = i * (prec + 1) + j + 1;
+			indices[k + 2] = (i + 1) * (prec + 1) + j;
+
+			indices[k + 3] = i * (prec + 1) + j + 1;
+			indices[k + 4] = (i + 1) * (prec + 1) + j + 1;
+			indices[k + 5] = (i + 1) * (prec + 1) + j;
+		}
+	}
+}
+
+	void BezierFace::generate(int prec)
 {
 	numVertices = (prec + 1) * (prec + 1);
 	numIndices = prec * prec * 6;
@@ -61,16 +83,16 @@ void BezierFace::generate(int prec)
 			float u = (float)i / prec;
 			float u1 = (float)(i + 1) / prec;
 			float v = (float)j / prec;
-			float theta = toRadians(v);
+			float theta = v * 2.0f * 3.14159f;
 
 			for (int k = 0; k <= 3; k++)
 			{
-				int index = k;
-				r += controlPointsVector[index].x * Bernstein(u, k);
-				r1 += controlPointsVector[index].x * Bernstein(u1, k);
-				y += controlPointsVector[index].y * Bernstein(u, k);
-				y1 += controlPointsVector[index].y * Bernstein(u1, k);
+				r += controlPointsVector[k].x * Bernstein(u, k);
+				r1 += controlPointsVector[k].x * Bernstein(u1, k);
+				y += controlPointsVector[k].y * Bernstein(u, k);
+				y1 += controlPointsVector[k].y * Bernstein(u1, k);
 			}
+
 			x = r * cos(theta);
 			z = r * sin(theta);
 
@@ -86,47 +108,14 @@ void BezierFace::generate(int prec)
 			// dy/dr= nr/-ny
 			float ny;
 
-			float mu = 0.0001;
-			if (y1 - y < mu && y - y1 < mu)
-			{
-				nx = 0;
-				nz = 0;
-				ny = -1;
-			}
-			else
-				ny = -(1.0) * (r1 - r) / (y1 - y);
+			normalCal(nx, ny, nz, y, y1, r, r1);
 
-			if (y1 - y < 0 && r1 - r < 0)
-			{
-				nx = -nx;
-				nz = -nz;
-				ny = -ny;
-			}
 			vertices[i * (prec + 1) + j].normal = glm::vec3(nx, ny, nz);
 			vertices[i * (prec + 1) + j].texCoord = glm::vec2(v, u);
 		}
 	}
-	// 计算索引
-	for (int i = 0; i < prec; i++)
-	{
-		for (int j = 0; j < prec; j++)
-		{
-			int k = 6 * (i * prec + j);
-			indices[k + 0] = i * (prec + 1) + j;
-			indices[k + 1] = i * (prec + 1) + j + 1;
-			indices[k + 2] = (i + 1) * (prec + 1) + j;
-
-			indices[k + 3] = i * (prec + 1) + j + 1;
-			indices[k + 4] = (i + 1) * (prec + 1) + j + 1;
-			indices[k + 5] = (i + 1) * (prec + 1) + j;
-			// for(int q=0;q<6;q++)
-			// cout<<indices[k + q]<<"x,y,z:"<<vertices[indices[k + q]].x
-			// <<' '<<vertices[indices[k + q]].y<<' '
-			// <<vertices[indices[k + q]].z<<' '<<endl;
-		}
-	}
+	indicesCal(prec);
 }
-float BezierFace::toRadians(float degrees) { return (degrees * 2.0f * 3.14159f); }
 
 float BezierFace::Bernstein(float t, int index)
 {
@@ -150,13 +139,6 @@ float BezierFace::Bernstein(float t, int index)
 BezierFace::BezierFace()
 {
 }
-
-// BezierFace::BezierFace(int i)
-// {
-// 	this->step = 3;
-// 	this->controlPoints = defControlPoints +8*i;
-// 	generate(100);
-// }
 
 BezierFace::BezierFace(vector<glm::vec2> vec, float l, float r)
 {

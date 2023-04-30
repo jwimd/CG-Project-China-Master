@@ -32,8 +32,11 @@ class BezierFace : public Object3D
 	float *controlPoints;
 	vector<glm::vec2> controlPointsVector;
 
-	float toRadians(float degrees);
 	float Bernstein(float u, int index);
+
+	void normalCal(float& nx, float& ny, float& nz, float y, float y1, float r, float r1);
+
+	void indicesCal(int prec);
 
 public:
 	BezierFace();
@@ -45,6 +48,4 @@ public:
 	int getNumIndices();
 	vector<Vertex> getVertices();
 	vector<int> getIndices();
-
-	bool getRadiance(float pos, float &y, float &r);
 };

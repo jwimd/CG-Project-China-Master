@@ -14,9 +14,8 @@
 // 模型类
 // 一个模型由多个贝叶斯旋转面连接而成
 
-class DIYtexture
+struct DIYtexture
 {
-public:
     int type;    // 0 环绕 //1 顶部
     int repeat;  // 一圈的重复数 顶部忽略
     float l, r;  // 范围
@@ -25,14 +24,8 @@ public:
     GLuint map;
     bool isRev = false, isTop = false;
     float pos = -0.2f, width = 0.4f;
-    DIYtexture(int t, int re, float l0, float r0, GLuint m)
+    DIYtexture(int t, int re, float l0, float r0, GLuint m) : type(m), repeat(re), l(l0), r(r0), map(m)
     {
-        type = t;
-        repeat = re;
-        l = l0;
-        r = r0;
-        map = m;
-        reverse = 0;
     }
 
     DIYtexture()
@@ -47,7 +40,6 @@ class DIYmodel : public Object3D
 {
 private:
     /* data */
-    glm::vec3 offset;
     vector<glm::vec3> vertices; // 锚点
     int active_point;
 
@@ -70,7 +62,6 @@ private:
     GLuint load_texture(string s, DIYtexture &diy);
     int load_model(vector<float> *pvalues, vector<float> *tvalues, vector<float> *nvalues);
     int load_frame(vector<float> *pvalues);
-    // int load_circle(vector<float> *pvalues, int tid, bool lor);
     bool load_active(vector<float> *pvalues);
     void makeFaces();
     void init();
@@ -83,7 +74,6 @@ public:
     vector<DIYtexture> textures;
     int active_tex;
 
-
     glm::vec3 oldright = {0.0f, 0.0f, 0.0f};
     glm::vec3 oldup = {0.0f, 0.0f, 0.0f};
     glm::vec3 oldfront = {0.0f, 0.0f, 0.0f};
@@ -92,34 +82,24 @@ public:
 
     int get_point(float x, float y, Camera *camera);
     int get_line_start_point(float x, float y, Camera *camera);
-    // int get_circle(float x, float y, Camera *camera, bool &lor);
-    // int get_between_circle(float x, float y, Camera *camera);
     void active(int index);
 
     void split_point(int pid);
     void remove_point(int pid);
     void modify_point(float dx, float dy, Camera *camera);
-    // void modify_offset(float dx, float dy, Camera *camera, int d);
 
     glm::mat4 getModelMatrix();
     void computeRotationQuat();
 
-    // void saveAsObjFile(const std::string &filename) const;
-
     void remake();
-    // void switch_material();
 
-    // void active_texture(int index);
     void add_texture(std::string name, GLuint tex);
-    // void modify_circle(float dx,float dy,Camera* camera,bool lor);
     void remove_texture(int index);
-    // void add_repeat(bool t);
-    // void trans_tex_type();
-    // void reverse_tex();
 
     void draw();
     void drawFrame(GLSLProgram *f);
-    // void DrawTexFrame(GLSLProgram *frameShader);
+
+    glm::vec4 wild_screen_baroque(glm::vec4 pos, glm::mat4 view, glm::mat4 projection, glm::mat4 model);
 
     void save_file(std::string path);
     void load_from_file(std::string path);

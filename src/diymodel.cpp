@@ -1,5 +1,3 @@
-// #include <windows.h>
-// #include <commdlg.h>
 #include <cmath>
 #include <fstream>
 #include <sstream>
@@ -110,43 +108,11 @@ int DIYmodel::load_model(vector<float> *pvalues, vector<float> *tvalues, vector<
     return index;
 }
 
-// int DIYmodel::load_circle(vector<float> *pvalues, int tid, bool lor)
-// {
-//     pvalues->clear();
-//     float y, r, pos;
-//     if (lor)
-//     {
-//         pos = textures[tid].l;
-//         pos = -1 + 2 * pos;
-//     }
-//     else
-//     {
-//         pos = textures[tid].r;
-//         pos = -1 + 2 * pos;
-//     }
-//     for (BezierFace f : faces)
-//     {
-//         if (f.getRadiance(pos, y, r))
-//         {
-//             for (float j = 0; j <= 100; j++)
-//             {
-//                 double theta = j / 100 * 2 * 3.1415926;
-//                 pvalues->push_back(r * cos(theta));
-//                 pvalues->push_back(y);
-//                 pvalues->push_back(r * sin(theta));
-//             }
-//             return 303;
-//         }
-//     }
-//     return 0;
-// }
-
 // 初始化
 void DIYmodel::init()
 {
     active_point = -1;
     active_tex = 0;
-    offset = glm::vec3(0, 0, 0);
     for (int i = 0; i < 10; i++)
     {
         vertices.push_back(glm::vec3(defPoints[3 * i], defPoints[3 * i + 1], defPoints[3 * i + 2]));
@@ -244,7 +210,7 @@ bool clamp(float x, float y, float diff)
     return false;
 }
 
-glm::vec4 wild_screen_baroque(glm::vec4 pos, glm::mat4 view, glm::mat4 projection, glm::mat4 model)
+glm::vec4 DIYmodel::wild_screen_baroque(glm::vec4 pos, glm::mat4 view, glm::mat4 projection, glm::mat4 model)
 {
 
     pos = model * pos;
@@ -280,7 +246,7 @@ void DIYmodel::modify_point(float dx, float dy, Camera *camera)
         return;
     else
     {
-        float z = camera->position.z - offset.z;
+        float z = camera->position.z;
         float dist = 155 / z;
         if (z < 0)
         {
@@ -295,45 +261,6 @@ void DIYmodel::modify_point(float dx, float dy, Camera *camera)
     }
 }
 
-// 移动整体
-// void DIYmodel::modify_offset(float dx, float dy, Camera *camera, int dimension)
-// {
-//     if (active_point < 0)
-//         return;
-//     else
-//     {
-//         float z = camera->position.z - offset.z;
-//         float dist = 1000 / z;
-
-//         if (dimension == 0)
-//         {
-//             offset.x += dx / (dist);
-//         }
-//         if (dimension == 1)
-//         {
-//             if (z < 0)
-//             {
-//                 offset.y += dy / (-dist);
-//             }
-//             else
-//             {
-//                 offset.y += dy / (dist);
-//             }
-//         }
-//         if (dimension == 2)
-//         {
-//             if (z < 0)
-//             {
-//                 offset.z -= dy / (dist);
-//             }
-//             else
-//             {
-//                 offset.z -= dy / (dist);
-//             }
-//         }
-//     }
-// }
-// 删除节点
 void DIYmodel::remove_point(int pid)
 {
     if (pid <= 0)
@@ -383,41 +310,10 @@ void DIYmodel::split_point(int pid)
             return;
         }
         else
-        {
             it++;
-        }
+    
     }
 }
-
-// void DIYmodel::modify_circle(float dx, float dy, Camera *camera, bool lor)
-// {
-//     if (active_tex < 0)
-//         return;
-//     else
-//     {
-//         float z = camera->position.z;
-//         if (z < 0)
-//             z = 0 - z;
-//         float dist = 1550 / z;
-//         if (lor)
-//         {
-//             textures[active_tex].l += dy / (dist);
-//             if (textures[active_tex].l > 1)
-//                 textures[active_tex].l = 0.999;
-//             if (textures[active_tex].l < 0)
-//                 textures[active_tex].l = 0;
-//         }
-
-//         else
-//         {
-//             textures[active_tex].r += dy / (dist);
-//             if (textures[active_tex].r > 1)
-//                 textures[active_tex].r = 0.999;
-//             if (textures[active_tex].r < 0)
-//                 textures[active_tex].r = 0;
-//         }
-//     }
-// }
 
 // 根据鼠标查找线段
 int DIYmodel::get_point(float x, float y, Camera *camera)
@@ -472,56 +368,6 @@ int DIYmodel::get_line_start_point(float x, float y, Camera *camera)
     }
     return -1;
 }
-// 根据鼠标寻找大圆
-// int DIYmodel::get_circle(float x, float y, Camera *camera, bool &lor)
-// {
-//     glm::mat4 projection = glm::perspective(glm::radians(camera->fovy), float(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
-//     glm::mat4 view = camera->getViewMatrix();
-//     glm::mat4 model;
-//     model = glm::translate(model, offset);
-//     float zc = camera->position.z;
-
-//     float yl, yr, r;
-
-//     for (int i = 0; i < textures.size(); i++)
-//     {
-//         for (BezierFace f : faces)
-//         {
-//             if (f.getRadiance(textures[i].l, yl, r))
-//             {
-
-//                 break;
-//             }
-//         }
-//         glm::vec4 pos(r, yl, 0.0, 1.0);
-//         pos = wild_screen_baroque(pos, view, projection, model);
-//         if (clamp(pos.y, y, 10.0))
-//         {
-//             lor = true;
-//             active_tex = i;
-//             return i;
-//         }
-
-//         for (BezierFace f : faces)
-//         {
-//             if (f.getRadiance(textures[i].r, yr, r))
-//             {
-
-//                 break;
-//             }
-//         }
-//         pos = glm::vec4(r, yr, 0.0, 1.0);
-//         pos = wild_screen_baroque(pos, view, projection, model);
-//         if (clamp(pos.x, x, 10.0) && clamp(pos.y, y, 10.0))
-//         {
-
-//             lor = false;
-//             active_tex = i;
-//             return i;
-//         }
-//     }
-//     return -1;
-// }
 
 void DIYmodel::load_from_file(std::string path)
 {
@@ -535,8 +381,6 @@ void DIYmodel::load_from_file(std::string path)
     string s;
     int size;
 
-    // is>>s;//"material"
-    // is>>material_idx;
     is >> s;
     is >> size;
 
@@ -546,14 +390,6 @@ void DIYmodel::load_from_file(std::string path)
         vertices.push_back(t);
     }
 
-    // is >> s;
-    // is >> size;
-
-    // for (int i = 0; i < size; i++)
-    // {
-    //     is >> dt.type >> dt.repeat >> dt.reverse >> dt.l >> dt.r >> dt.name;
-    //     textures.push_back(dt);
-    // }
 
     is.close();
 }
@@ -564,22 +400,12 @@ void DIYmodel::save_file(std::string path)
     ofstream os;
     os.open(path);
 
-    // os<<"material"<<endl;
-    // os<<material_idx<<endl;
     os << "vertices_begin" << ' ' << vertices.size() << endl;
 
     for (auto x : vertices)
     {
         os << x.x << ' ' << x.y << ' ' << x.z << endl;
     }
-
-    // os << "texs_begin" << ' ' << textures.size() << endl;
-    // for (auto x : textures)
-    // {
-    //     os << x.type << ' ' << x.repeat << ' ' << x.reverse << ' ' << x.l << ' ' << x.r << ' ' << x.name << endl;
-    // }
-
-    // os << "texs_end" << endl;
 
     os.close();
 }
@@ -654,101 +480,6 @@ void DIYmodel::drawFrame(GLSLProgram *frameShader)
     fpvalues.clear();
 }
 
-// void DIYmodel::DrawTexFrame(GLSLProgram *frameShader)
-// {
-//     fpvalues.clear();
-//     if (textures.size() == 0)
-//         return;
-
-//     frameShader->use();
-//     for (int i = 0; i < textures.size(); i++)
-//     {
-
-//         glDisable(GL_DEPTH_TEST);
-//         frameShader->setVec3("color", glm::vec3(0.0, 0.5, 0.5));
-//         findex = load_circle(&fpvalues, i, true);
-
-//         glGenVertexArrays(1, &VAO2);
-//         glGenBuffers(1, &VBO2);
-//         glBindVertexArray(VAO2);
-//         glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-//         glBufferData(GL_ARRAY_BUFFER, fpvalues.size() * 4, &fpvalues[0], GL_STREAM_DRAW);
-
-//         glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-//         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-//         glEnableVertexAttribArray(0);
-
-        
-//         if (i == active_tex)
-//             glDrawArrays(GL_LINE_STRIP, 0, findex);
-
-//         frameShader->setVec3("color", glm::vec3(1.0, 1.0, 1.0));
-//         glDrawArrays(GL_POINTS, 0, 1);
-
-//         glEnable(GL_DEPTH_TEST);
-
-//         frameShader->setVec3("color", glm::vec3(0.5, 0.0, 0.5));
-
-//         glDisable(GL_DEPTH_TEST);
-//         findex = load_circle(&fpvalues, i, false);
-//         glGenVertexArrays(1, &VAO2);
-//         glGenBuffers(1, &VBO2);
-//         glBindVertexArray(VAO2);
-//         glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-//         glBufferData(GL_ARRAY_BUFFER, fpvalues.size() * 4, &fpvalues[0], GL_STREAM_DRAW);
-//         glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-//         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-//         glEnableVertexAttribArray(0);
-
-        
-//         if (active_tex)
-//             glDrawArrays(GL_LINE_STRIP, 0, findex);
-        
-//         frameShader->setVec3("color", glm::vec3(1.0, 1.0, 1.0));
-//         glDrawArrays(GL_POINTS, 0, 1);
-
-//         glEnable(GL_DEPTH_TEST);
-//     }
-// }
-
-// GLuint DIYmodel::load_texture(string s, DIYtexture &diytex)
-// {
-//     GLuint texture;
-//     glGenTextures(1, &texture);
-//     glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
-//     // set the texture wrapping parameters
-//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // set texture wrapping to GL_REPEAT (default wrapping method)
-//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//     // set texture filtering parameters
-//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//     // load image, create texture and generate mipmaps
-//     int width, height, nrChannels;
-//     // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-//     unsigned char *data = stbi_load(s.c_str(), &width, &height, &nrChannels, 0);
-//     if (data)
-//     {
-//         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-//         glGenerateMipmap(GL_TEXTURE_2D);
-//     }
-//     else
-//     {
-//         std::cout << "Failed to load texture" << std::endl;
-//     }
-//     stbi_image_free(data);
-//     diytex.map = texture;
-
-//     return texture;
-// }
-
-// void DIYmodel::switch_material()
-// {
-
-//     material_idx += 1;
-//     if (material_idx >= 6)
-//         material_idx = 0;
-// }
-
 void DIYmodel::add_texture(std::string name, GLuint tex)
 {
     DIYtexture newtx;
@@ -765,37 +496,6 @@ void DIYmodel::add_texture(std::string name, GLuint tex)
     active_tex = textures.size();
     textures.push_back(newtx);
 }
-
-// void DIYmodel::add_repeat(bool t)
-// {
-//     if (t)
-//     {
-//         textures[active_tex].repeat++;
-//     }
-//     else
-//     {
-//         textures[active_tex].repeat--;
-//         if (textures[active_tex].repeat < 1)
-//             textures[active_tex].repeat = 1;
-//     }
-// }
-
-// void DIYmodel::trans_tex_type()
-// {
-//     textures[active_tex].type = 1 - textures[active_tex].type;
-// }
-// void DIYmodel::reverse_tex()
-// {
-//     textures[active_tex].reverse = 1 - textures[active_tex].reverse;
-// }
-
-// void DIYmodel::active_texture(int index)
-// {
-//     if (textures.size() <= index)
-//         return;
-
-//     active_tex = index;
-// }
 
 void DIYmodel::remove_texture(int index)
 {

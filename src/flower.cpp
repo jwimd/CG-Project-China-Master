@@ -12,18 +12,7 @@ using namespace std;
 #include "base/camera.h"
 #include "flower.h"
 
-float randFloat01()
-{
-    return 1.0 * rand() / RAND_MAX;
-}
-float randFloat(float from, float to)
-{
-    return from + (to - from) * randFloat01();
-}
-int randInt(int from, int to)
-{
-    return from + rand() % (to - from);
-}
+#define randFloat(from,to) (from + (to - from) * 1.0 * rand() / RAND_MAX)
 
 FlowerSystem::FlowerSystem()
 {
@@ -72,7 +61,7 @@ void FlowerSystem::update(GLfloat deltaTime)
 {
     maxlifespan = 3000;
     Flower flower;
-    int newNum = randInt(1, 10);
+    int newNum = 1 + rand() % (10 - 1);
     if (newNum == 1)
     {
         // if(flowers.size()>totnum) break;
@@ -97,7 +86,7 @@ void FlowerSystem::update(GLfloat deltaTime)
             flowers[i].rotation_i = 90;
             flowers[i].rotation = glm::vec3(1, 0, 0);
             flowers[i].statical = true;
-            flowers[i].rotation_y = randInt(0, 180);
+            flowers[i].rotation_y = 1 + rand() % (180 - 1);
         }
         // 判断摧毁
         flowers[i].life--;
@@ -118,10 +107,10 @@ void FlowerSystem::draw(Camera *camera)
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(texcoords), texcoords, GL_STATIC_DRAW);
-    glEnable(GL_DEPTH_TEST);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(texcoords), texcoords, GL_STREAM_DRAW);
+
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
     glEnableVertexAttribArray(0);
@@ -133,7 +122,7 @@ void FlowerSystem::draw(Camera *camera)
         glActiveTexture(GL_TEXTURE20);
     else
         glActiveTexture(GL_TEXTURE21);
-    glEnable(GL_DEPTH_TEST);
+
     texture[type]->bind();
     shader->use();
     if (type == 0)
